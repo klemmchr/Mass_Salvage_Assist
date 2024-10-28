@@ -1,7 +1,7 @@
 ## Interface: 110005
 ## Title: Mass Mill Assist
 ## Author: TheGenomeWhisperer
-## Version: 1.0.0
+## Version: 1.0.1
 ## Notes: Mass Mill without error or interruption
 ## SavedVariables: MassMA_save
 

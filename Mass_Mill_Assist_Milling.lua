@@ -177,8 +177,12 @@ end
 -- What it Does:    Acts as an event listener to control when to trigger the herb stacking action
 -- Purpose:         Quality of life helper for mass milling.
 Milling.MillListener = function ()
-    if MassMA_save.non_stop and not combiningHerbs and ( C_TradeSkillUI.GetRemainingRecasts() < 25 or Milling.GetFirstHerbSizeStack() < 100 ) then
-        Milling.CombineHerbStacks();
+    if MassMA_save.non_stop and not combiningHerbs then
+        local first_stack = Milling.GetFirstHerbSizeStac
+        local remaining_casts = C_TradeSkillUI.GetRemainingRecasts()
+        if ( remaining_casts and C_TradeSkillUI.GetRemainingRecasts() < 25 ) or ( first_stack and first_stack < 100 ) then
+            Milling.CombineHerbStacks();
+        end
     end
 end
 
@@ -197,3 +201,40 @@ MillingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , t , failed_
     end
 
 end);
+
+-- -- To be used eventually
+-- HerbsEnum = {
+--     ["CLASSIC"] = {
+--         [765] = true , [785] = true , [2447] = true , [2449] = true , [2450] = true , [2452] = true , [2453] = true , [3355] = true , [3356] = true , [3357] = true , [3358] = true , [3369] = true , [3820] = true , [3818] = true , [3819] = true , [3821] = true , [4625] = true , [8153] = true , [8831] = true , [8836] = true , [8838] = true , [8839] = true , [8845] = true , [8846] = true , [13463] = true , [13464] = true , [13465] = true , [13466] = true , [13467] = true , [13468] = true , [19726] = true
+--     },
+--     ["TBC"] = {
+--         [181270] = true , [181271] = true , [181275] = true , [181277] = true , [181278] = true , [181279] = true , [181280] = true , [181281] = true
+--     },
+--     ["WOTLK"] = {
+--         [190169] = true , [190170] = true , [190171] = true , [190172] = true , [190173] = true , [190175] = true , [190176] = true , [191303] = true , [189973] = true , [191019] = true
+--     },
+--     ["CATA"] = {
+--         [202747] = true , [202748] = true , [202749] = true , [202750] = true , [202751] = true , [202752] = true
+--     },
+--     ["PANDA"] = {
+--         [89639] = true , [109130] = true , [79010] = true , [79011] = true , [72235] = true , [72237] = true
+--     },
+--     ["WOD"] = {
+--         [109124] = true , [109125] = true , [109126] = true , [109127] = true , [109128] = true , [109129] = true   -- Chameleon Lotus removed from game
+--     },
+--     ["LG"] = {
+--         [124101] = true , [124102] = true , [124103] = true , [124104] = true , [124105] = true , [124106] = true , [128304] = true , [151565] = true
+--     },
+--     ["BFA"] = {
+--         [152505] = true , [152506] = true , [152507] = true , [152508] = true , [152509] = true , [152510] = true , [152511] = true , [168487] = true
+--     },
+--     ["SL"] = {
+--         [187699] = true , [171315] = true , [168583] = true , [168586] = true , [168589] = true , [170554] = true , [169701] = true
+--     },
+--     ["DF"] = {
+--         [191460 ] = true , [191461] = true , [191462] = true , [191464 ] = true , [191465] = true , [191466] = true , [191467 ] = true , [191468] = true , [191469] = true , [191470 ] = true , [191471] = true , [191472] = true
+--     },
+--     ["TWW"] = {
+--         [210796] = true , [210797] = true , [210798] = true , [210799] = true , [210800] = true , [210801] = true , [210802] = true , [210803] = true , [210804] = true , [210805] = true , [210806] = true , [210807] = true , [210808] = true , [210809] = true , [210810] = true , [222538] = true
+--     }
+-- }

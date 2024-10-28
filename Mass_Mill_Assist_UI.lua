@@ -30,6 +30,7 @@ UI.LoadUI = function()
             MassMA_save.non_stop = self:GetChecked()
         end)
 
+        -- Tooltip
         UI.MMA_checkbox:SetScript ( "OnEnter" , function( self )
             GameTooltip:SetOwner ( self , "ANCHOR_CURSOR" );
             GameTooltip:AddLine ( "MMA Limitation: Nonstop will only work for herbs within player bags, not bank tabs." );

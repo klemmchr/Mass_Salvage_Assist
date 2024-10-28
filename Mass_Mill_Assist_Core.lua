@@ -33,6 +33,15 @@ end
 local InitializeAddon = function()
     if MassMA.UI and MassMA.UI.LoadUI then
         LoadSettings();
+
+        if ProfessionsFrame then        -- In the case another addon has already pre-loaded the professions frame, this will force UI to load too.
+            MassMA.UI.LoadUI();
+            MassMA.Initialization:UnregisterAllEvents();
+            MassMA.Initialization = nil;
+        else
+            MassMA.Initialization:UnregisterEvent("PLAYER_ENTERING_WORLD");
+        end
+
     else
         C_Timer.After ( 1 , MassMA.InitializeAddon)
     end
@@ -53,7 +62,6 @@ local ActivateAddon = function ( _ , event , addon )
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         InitializeAddon();
-        MassMA.Initialization:UnregisterEvent("PLAYER_ENTERING_WORLD");
     end
 end
 

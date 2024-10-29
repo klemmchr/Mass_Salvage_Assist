@@ -1,0 +1,10 @@
+## Interface: 110005
+## Title: Mass Crafting Assist
+## Author: TheGenomeWhisperer (Arkaan-Zul'jin)
+## Version: 1.0.0
+## Notes: Mass Craft without error or interruption
+## SavedVariables: MCA_save
+
+MCA_Core.lua
+MCA_Crafting.lua
+MCA_UI.lua

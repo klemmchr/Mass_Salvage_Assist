@@ -1,12 +1,4 @@
-## **Mass Mill Assist - Version 1.0.1 - Oct 27th, 2924
 
-***BUG FIXES***
+## **Mass Crafting Assist - Version 1.0.0 - Oct 28th, 2024
 
-* Fixed a small lua error that could occur when reaching the final end of your herb stacks.
-
-* This addon should now properly load for any addon, like Craftsim, that preloads the Professions interface.
-
-
-## **Mass Mill Assist - Version 1.0.0 - Oct 25th, 2924
-
-* Release version 1.0.0 - Initial Release
+* Mass Mill Assist has been converted to Mass Crafting Assist due to expanded functionality beyond milling.

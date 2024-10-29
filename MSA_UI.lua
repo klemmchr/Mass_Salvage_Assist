@@ -26,7 +26,7 @@ UI.LoadUI = function()
         UI.MSA_checkbox:SetHitRectInsets ( 0 , 0 - UI.MSA_checkbox.Text:GetWidth() - 2 , 0 , 0 );
 
         -- Ensures this is always to the left of the CreateAllButton, accounting for width of text also
-        UI.MSA_checkbox:SetPoint ( "RIGHT" , ProfessionsFrame.CraftingPage.CreateAllButton , "LEFT" , - math.abs ( select ( 2 , UI.MSA_checkbox:GetHitRectInsets() ) ) - 12 , 0 )
+        UI.MSA_checkbox:SetPoint ( "BOTTOMLEFT" , ProfessionsFrame.CraftingPage.CreateAllButton , "TOPLEFT" , 0 , 10 )
 
         -- Change the setting wether enabled or not
         UI.MSA_checkbox:SetScript ( "OnClick" , function( self )

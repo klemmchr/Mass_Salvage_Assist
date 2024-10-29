@@ -1,9 +1,14 @@
 
+
+## **Mass Salvage Assist - Version 1.0.2 - Oct 29th, 2024
+
+* Changed position of the checkbox so it is compatible with other professions.
+
+
 ## **Mass Salvage Assist - Version 1.0.1 - Oct 29th, 2024
 
 * Fixed an issue that can cause a Lua error with certain reagents.
 
-* Changed the position of the checkbox so it is better compatible with other addons, like Profession Shopping List
 
 ## **Mass Crafting Assist - Version 1.0.0 - Oct 28th, 2024
 

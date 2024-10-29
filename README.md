@@ -4,7 +4,7 @@
 
 Assists in Mass Crafting in World of Warcraft by allowing you to mass craft nonstop. For example, Mass milling, prospecting, thaumaturgy, etc.
 
-**COMPATIBLE PROFESSIOSN**
+**COMPATIBLE PROFESSIONS**
 
 * Alchemy
 * Herbalism

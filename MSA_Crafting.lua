@@ -1,12 +1,12 @@
 
 local Crafting = {};
-MCA.Crafting = Crafting;
+MSA.Crafting = Crafting;
 
 local combiningStacks = false;
 
 -- Method:          Crafting.Establish_Spells()
 -- What it DoeS:    Builds the dictionary tables for all the profession spells supported
--- Purpose:         Ensure the UI features are only availab le at compatible profession spells.
+-- Purpose:         Ensure the UI features are only available at compatible profession spells.
 -- Note:            The int value of all ids is the number of reagents that need to be processed in spell
 Crafting.Establish_Spells = function()
     Crafting.Profs = {}
@@ -128,7 +128,7 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft
     end
     combiningStacks = false;
     if restart_crafting and not C_TradeSkillUI.IsRecipeRepeating() then
-        print("MCA: Crafting has ended prematurely. Please restart and crafting will continue nonstop." )
+        print("MSA: Crafting has ended prematurely. Please restart and crafting will continue nonstop." )
     end
 end
 
@@ -148,7 +148,7 @@ end
 Crafting.GetSalveItemDetails = function( restart_crafting )
 
     local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item then
+    if not item or type(item.debugItemID) ~= "number" then
         return;
     end
 
@@ -184,7 +184,7 @@ end
 -- Purpose:         Need to know how many in the stack if going to initialize reagent stacking immediately.
 Crafting.GetFirstReagentSizeStack = function()
     local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item then
+    if not item or type(item.debugItemID) ~= "number" then
         return;
     end
 
@@ -208,13 +208,14 @@ end
 --                  quick bag check if crafting should be continued again after crafting.
 Crafting.Is_More_To_Craft = function( craft_id )
     local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item then
+    if not item or type(item.debugItemID) ~= "number" then
         return false;
     end
-    local total_count = 0;
-    local first_stack_count = 0;
+
     local max_stack_size = C_Item.GetItemMaxStackSizeByID(item.debugItemID);
     local default_stack_min = Crafting.Get_Reagent_Count_Spell(craft_id);
+    local total_count = 0;
+    local first_stack_count = 0;
     local needs_to_stack = false;
     local more_to_craft = false;
 
@@ -276,7 +277,7 @@ end
 -- What it Does:    Acts as an event listener to control when to trigger the reagent stacking action
 -- Purpose:         Quality of life helper for mass Crafting.
 Crafting.CraftListener = function ( craft_id )
-    if MCA_save.non_stop and not combiningStacks then
+    if MSA_save.non_stop and not combiningStacks then
         local first_stack = Crafting.GetFirstReagentSizeStack()
         local remaining_casts = C_TradeSkillUI.GetRemainingRecasts()
 
@@ -302,7 +303,7 @@ Crafting.IsMassCraftingSpell = function( craft_id )
 end
 
 -- Event listener to account for actions to know when to align conditions to begin stacking the reagents in bags.
-local CraftingFrame = CreateFrame( "FRAME" , "MCA_CraftingListener" );
+local CraftingFrame = CreateFrame( "FRAME" , "MSA_CraftingListener" );
 CraftingFrame:RegisterEvent( "TRADE_SKILL_CRAFT_BEGIN" );
 CraftingFrame:RegisterEvent( "UNIT_SPELLCAST_FAILED" );
 CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed_id )
@@ -312,7 +313,7 @@ CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed
             Crafting.CraftListener(craft_id);
         end
 
-    elseif event == "UNIT_SPELLCAST_FAILED" and MCA_save.non_stop and Crafting.IsMassCraftingSpell ( failed_id ) and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
+    elseif event == "UNIT_SPELLCAST_FAILED" and MSA_save.non_stop and Crafting.IsMassCraftingSpell ( failed_id ) and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
         local needs_to_stack , more_to_craft = Crafting.Is_More_To_Craft();
 
         -- Do we need to restack herbs and restart, or do we need to just restart
@@ -320,7 +321,7 @@ CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed
             Crafting.CombineStacks( nil , nil , true , craft_id );
 
         elseif more_to_craft then
-            print("MCA: Crafting has ended prematurely. Please restart and crafting will continue nonstop." )
+            print("MSA: Crafting has ended prematurely. Please restart and crafting will continue nonstop." )
         end
     end
 

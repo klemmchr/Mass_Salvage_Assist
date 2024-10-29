@@ -1,8 +1,8 @@
-# Mass Crafting Assist - World of Warcraft Addon
+# Mass Salvage Assist - World of Warcraft Addon
 
 **WHAT IT DOES**
 
-Assists in Mass Crafting in World of Warcraft by allowing you to mass craft nonstop. For example, Mass milling, prospecting, thaumaturgy, etc.
+Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass salvage nonstop. For example, Mass milling, prospecting, thaumaturgy, etc.
 
 **COMPATIBLE PROFESSIONS**
 
@@ -14,7 +14,7 @@ Assists in Mass Crafting in World of Warcraft by allowing you to mass craft nons
 * Jewelcrafting
 * Inscription
 
-* Compatible with mass crafting of the current expansion, as well as all previous expansions, if it applies.
+* Compatible with mass salvaging of the current expansion, as well as all previous expansions, if it applies.
 * Continually combines all stacks of the originally selected reagents until complete
 * Helps avoid the stacking error that prevents you from mass milling even though you should be able to.
 

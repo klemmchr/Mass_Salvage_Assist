@@ -1,4 +1,10 @@
 
+## **Mass Salvage Assist - Version 1.0.1 - Oct 29th, 2024
+
+* Fixed an issue that can cause a Lua error with certain reagents.
+
+* Changed the position of the checkbox so it is better compatible with other addons, like Profession Shopping List
+
 ## **Mass Crafting Assist - Version 1.0.0 - Oct 28th, 2024
 
 * Mass Mill Assist has been converted to Mass Crafting Assist due to expanded functionality beyond milling.

@@ -35,7 +35,7 @@ UI.LoadUI = function()
         -- Tooltip
         UI.MMA_checkbox:SetScript ( "OnEnter" , function( self )
             GameTooltip:SetOwner ( self , "ANCHOR_CURSOR" );
-            GameTooltip:AddLine ( "MMA Limitation: Nonstop will only work for reagents within player bags, not bank tabs." );
+            GameTooltip:AddLine ( "MCA Limitation: Nonstop will only work for reagents within player bags, not bank tabs." );
             GameTooltip:Show();
         end);
 
@@ -58,7 +58,6 @@ end
 -- Purpose:         Addon will continue to expand usage.
 UI.Is_Supported_Profession = function ( profession_id )
 
-    -- Adding the profession names eventually...
     local ids = {
         -- [164] = "Blacksmithing",
         -- [165] = "Leatherworking",
@@ -67,7 +66,6 @@ UI.Is_Supported_Profession = function ( profession_id )
         [185] = "Cooking",
         [197] = "Tailoring",
         [202] = "Engineering",
-        [333] = "Enchanting",
         [755] = "Jewelcrafting",
         [773] = "Inscription"
     }

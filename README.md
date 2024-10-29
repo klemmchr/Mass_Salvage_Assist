@@ -11,7 +11,6 @@ Assists in Mass Crafting in World of Warcraft by allowing you to mass craft nons
 * Cooking
 * Tailoring
 * Engineering
-* Enchanting (Shatter Essence only)
 * Jewelcrafting
 * Inscription
 

@@ -7,35 +7,33 @@ local combiningStacks = false;
 -- Method:          Crafting.Establish_Spells()
 -- What it DoeS:    Builds the dictionary tables for all the profession spells supported
 -- Purpose:         Ensure the UI features are only availab le at compatible profession spells.
+-- Note:            The int value of all ids is the number of reagents that need to be processed in spell
 Crafting.Establish_Spells = function()
     Crafting.Profs = {}
     Crafting.Profs.MillingSpells = {
-        [444181] = true, [382981] = true, [382982] = true, [382984] = true,
-        [382986] = true, [382987] = true, [382988] = true, [382989] = true,
-        [382990] = true, [382991] = true, [382994] = true
+        [444181] = 5, [382981] = 5, [382982] = 5, [382984] = 5,
+        [382986] = 5, [382987] = 5, [382988] = 5, [382989] = 5,
+        [382990] = 5, [382991] = 5, [382994] = 5
     }
     Crafting.Profs.Jewelcrafting = {
-        [434018] = true, [434020] = true, [374627] = true, [395696] = true, [325248] = true,
-        [382973] = true, [382975] = true, [382977] = true, [382978] = true, [404740] = true ,
-        [382979] = true, [382980] = true, [382995] = true
+        [434018] = 5, [434020] = 3, [374627] = 5, [395696] = 5, [325248] = 5,
+        [382973] = 5, [382975] = 5, [382977] = 5, [382978] = 5, [404740] = 3,
+        [382979] = 5, [382980] = 5, [382995] = 5
     }
     Crafting.Profs.HerbalismRefine = {
-        [438811] = true, [438812] = true, [391088] = true, [391089] = true
+        [438811] = 5, [438812] = 5, [391088] = 5, [391089] = 5
     }
     Crafting.Profs.Cooking = {
-        [445117] = true, [445127] = true, [445118] = true, [445119] = true, [447869] = true
+        [445117] = 5, [445127] = 5, [445118] = 5, [445119] = 5, [447869] = 5
     }
     Crafting.Profs.Alchemy = {
-        [430315] = true, [370748] = true
+        [430315] = 20, [370748] = 5
     }
     Crafting.Profs.Tailoring = {
-        [446926] = true
+        [446926] = 5
     }
     Crafting.Profs.Engineering = {
-        [447310] = true, [447311] = true
-    }
-    Crafting.Profs.Enchanting = {
-        [445466] = true         -- Shatter Essence
+        [447310] = 5, [447311] = 5
     }
 end
 
@@ -55,6 +53,7 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting )
         local maxStackSize = 0  -- Placeholder til it gets replaced.
         local itemInfo;
         local itemID;
+        local default_stack_min = 5
 
         if not scrapSlot and ( C_TradeSkillUI.IsRecipeRepeating() or restart_crafting ) then
             scrapSlot , itemID = Crafting.GetSalveItemDetails();
@@ -80,7 +79,7 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting )
 
                             maxStackSize = C_Item.GetItemMaxStackSizeByID(itemID);
 
-                            if lowestStack and lowestStack[3] > itemInfo.stackCount then
+                            if lowestStack and lowestStack[3] > itemInfo.stackCount and lowestStack[3] > default_stack_min then -- This
                                 lowestStack = { bag , slot , itemInfo.stackCount};
                             elseif not lowestStack then
                                 lowestStack = { bag , slot , itemInfo.stackCount};
@@ -262,6 +261,7 @@ Crafting.CraftListener = function ( craft_id )
     if MCA_save.non_stop and not combiningStacks then
         local first_stack = Crafting.GetFirstReagentSizeStack()
         local remaining_casts = C_TradeSkillUI.GetRemainingRecasts()
+        print("Remaining Casts: " .. remaining_casts .. " : vs " .. " : " .. C_TradeSkillUI.GetCraftableCount( craft_id ))
 
         -- Note: Get CraftableCount is minus 2 to accomodate for API counting mismatch, it's always 1 less because you just crafted, and there is a 1 count lag,
         if ( remaining_casts and remaining_casts < 25 and ( C_TradeSkillUI.GetCraftableCount( craft_id ) - 2) > remaining_casts ) or ( first_stack and first_stack < 100 ) then

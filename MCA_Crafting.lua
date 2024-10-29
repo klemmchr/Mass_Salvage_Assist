@@ -255,14 +255,16 @@ Crafting.is_warband_bank_open = function()
     end
 end
 
--- Method:          Crafting.CraftListener ()
+-- Method:          Crafting.CraftListener ( int )
 -- What it Does:    Acts as an event listener to control when to trigger the reagent stacking action
 -- Purpose:         Quality of life helper for mass Crafting.
-Crafting.CraftListener = function ()
+Crafting.CraftListener = function ( craft_id )
     if MCA_save.non_stop and not combiningStacks then
         local first_stack = Crafting.GetFirstReagentSizeStack()
         local remaining_casts = C_TradeSkillUI.GetRemainingRecasts()
-        if ( remaining_casts and C_TradeSkillUI.GetRemainingRecasts() < 25 ) or ( first_stack and first_stack < 100 ) then
+
+        -- Note: Get CraftableCount is minus 2 to accomodate for API counting mismatch, it's always 1 less because you just crafted, and there is a 1 count lag,
+        if ( remaining_casts and remaining_casts < 25 and ( C_TradeSkillUI.GetCraftableCount( craft_id ) - 2) > remaining_casts ) or ( first_stack and first_stack < 100 ) then
             Crafting.CombineStacks();
         end
     end
@@ -290,7 +292,7 @@ CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed
 
     if event == "TRADE_SKILL_CRAFT_BEGIN" then
         if Crafting.IsMassCraftingSpell ( craft_id ) then
-            Crafting.CraftListener();
+            Crafting.CraftListener(craft_id);
         end
 
     elseif event == "UNIT_SPELLCAST_FAILED" and MCA_save.non_stop and Crafting.IsMassCraftingSpell ( failed_id ) and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then

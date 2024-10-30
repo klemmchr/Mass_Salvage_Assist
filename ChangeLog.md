@@ -1,4 +1,9 @@
 
+## **Mass Salvage Assist - Version 1.0.3 - Oct 29th, 2024
+
+* Coreway Catalysts spell added for Alchemy
+
+* Gleaming Shatter added for Enchanting
 
 ## **Mass Salvage Assist - Version 1.0.2 - Oct 29th, 2024
 

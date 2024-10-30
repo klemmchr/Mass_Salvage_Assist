@@ -13,6 +13,7 @@ Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass 
 * Engineering
 * Jewelcrafting
 * Inscription
+* Enchanting
 
 * Compatible with mass salvaging of the current expansion, as well as all previous expansions, if it applies.
 * Continually combines all stacks of the originally selected reagents until complete

@@ -67,6 +67,7 @@ UI.Is_Supported_Profession = function ( profession_id )
         [185] = "Cooking",
         [197] = "Tailoring",
         [202] = "Engineering",
+        [333] = 'Enchanting',
         [755] = "Jewelcrafting",
         [773] = "Inscription"
     }

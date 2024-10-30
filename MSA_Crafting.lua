@@ -27,13 +27,16 @@ Crafting.Establish_Spells = function()
         [445117] = 5, [445127] = 5, [445118] = 5, [445119] = 5, [447869] = 5
     }
     Crafting.Profs.Alchemy = {
-        [430315] = 20, [370748] = 5
+        [430315] = 20, [370748] = 5, [427214] = 5
     }
     Crafting.Profs.Tailoring = {
         [446926] = 5
     }
     Crafting.Profs.Engineering = {
         [447310] = 5, [447311] = 5
+    }
+    Crafting.Profs.Enchanting = {
+        [470726] = 1
     }
 end
 

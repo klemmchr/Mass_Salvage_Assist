@@ -7,6 +7,8 @@
 
 * Mass Salvage Assist(MSA) will now full support salvaging nonstop even without the profession window open.
 
+**SALVAGING WITHOUT PROFESSION WINDOW OPEN**
+
 * Slash command has been added to the addon `/msa`
 
     - Example - Mass Mill Hochenblume:
@@ -18,7 +20,6 @@
 
     - YES, this can be used within a macro.
 
-* Please note, the profession
 
 ## **Mass Salvage Assist - Version 1.0.3 - Oct 29th, 2024
 

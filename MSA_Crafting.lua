@@ -4,6 +4,11 @@ MSA.Crafting = Crafting;
 
 local combiningStacks = false;
 
+-- This is for tracking the item ID being salvaged since API cannot grab it without profession
+--  window being oepn. This accomodates people who macro craft without using the window
+local record_next = false;
+local salvage_item_id = 0;
+
 -- Method:          Crafting.Establish_Spells()
 -- What it DoeS:    Builds the dictionary tables for all the profession spells supported
 -- Purpose:         Ensure the UI features are only available at compatible profession spells.
@@ -40,6 +45,7 @@ Crafting.Establish_Spells = function()
     }
 end
 
+
 -- Method:          Crafting.Get_Reagent_Count_Spell ( int )
 -- What it Does:    Returns the number of reagents needed for that crafting spell
 -- Purpose:         When combining stacks, I want to always pick the lowest stack first, UNLESS it is small than the minimum stack size to craft
@@ -53,12 +59,11 @@ Crafting.Get_Reagent_Count_Spell = function( craft_id )
     end
 end
 
--- Method:          Crafting.CombineStacks ( list , bool , bool , int )
+-- Method:          Crafting.CombineStacks ( list , int , bool , bool , int )
 -- What it Does:    Determines which item is being processed, and then keeps the stacks refreshed so crafting can continue indefinitely.
 -- Purpose:         Quality of life for crafting thousands.
-Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft_id )
+Crafting.CombineStacks = function( scrapSlot , itemID , forced , restart_crafting , craft_id )
     if not combiningStacks or forced then
-
         combiningStacks = true;
         scrapSlot = scrapSlot or nil;
         if restart_crafting == nil then
@@ -68,7 +73,6 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft
         local lowestStack;
         local maxStackSize = 0  -- Placeholder til it gets replaced.
         local itemInfo;
-        local itemID;
 
         if not scrapSlot and ( C_TradeSkillUI.IsRecipeRepeating() or restart_crafting ) then
             scrapSlot , itemID = Crafting.GetSalveItemDetails( restart_crafting );
@@ -97,7 +101,7 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft
                             maxStackSize = C_Item.GetItemMaxStackSizeByID(itemID);
                             default_stack_min = Crafting.Get_Reagent_Count_Spell(craft_id);
 
-                            if lowestStack and lowestStack[3] > itemInfo.stackCount and lowestStack[3] > default_stack_min then -- This
+                            if lowestStack and lowestStack[3] > itemInfo.stackCount and lowestStack[3] >= default_stack_min then
                                 lowestStack = { bag , slot , itemInfo.stackCount};
                             elseif not lowestStack then
                                 lowestStack = { bag , slot , itemInfo.stackCount};
@@ -113,19 +117,19 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft
                 C_Container.PickupContainerItem( lowestStack[1] , lowestStack[2] );
                 C_Container.PickupContainerItem( scrapSlot[1] , scrapSlot[2] );
 
-                -- I don't want to necessarily restart it - This also can only be called WHEN already mass crafting or it will cause taint.
+                -- This can only be called WHEN already mass crafting or it will cause taint.
                 if C_TradeSkillUI.IsRecipeRepeating() then
-                    Crafting.Refresh_Crafting();
+                    Crafting.Refresh_Crafting( craft_id , maxStackSize , scrapSlot[1] , scrapSlot[2] );
                 end
 
                 if (scrapSlot[3] + lowestStack[3]) < maxStackSize then
                     C_Timer.After ( 2 , function()
-                        Crafting.CombineStacks( scrapSlot , true , restart_crafting , craft_id );  -- Cycle back through to collect ALL the items. There needs to be a slight delay between each item move due to Blizz's bag limitations with stacking.
+                        Crafting.CombineStacks( scrapSlot , itemID , true , restart_crafting , craft_id );  -- Cycle back through to collect ALL the items. There needs to be a slight delay between each item move due to Blizz's bag limitations with stacking.
                     end);
                     return;
                 end
             elseif C_TradeSkillUI.IsRecipeRepeating() then
-                Crafting.Refresh_Crafting();
+                Crafting.Refresh_Crafting( craft_id , C_Item.GetItemMaxStackSizeByID(itemID) , scrapSlot[1] , scrapSlot[2] );
             end
         end
     end
@@ -135,11 +139,18 @@ Crafting.CombineStacks = function( scrapSlot , forced , restart_crafting , craft
     end
 end
 
--- Method:          Crafting.Refresh_Crafting()
+-- Method:          Crafting.Refresh_Crafting( int , int , int , int )
 -- What it Does:    Refreshes the Craft all/Mill All button
 -- Purpose:         Useful so stacks don't run out.
-Crafting.Refresh_Crafting = function()
-    ProfessionsFrame.CraftingPage:CreateInternal(ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo().recipeID, ProfessionsFrame.CraftingPage:GetCraftableCount(), ProfessionsFrame.CraftingPage.SchematicForm:GetCurrentRecipeLevel())
+Crafting.Refresh_Crafting = function( craft_id , maxStackSize , bag , slot )
+
+    if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
+        ProfessionsFrame.CraftingPage:CreateInternal(ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo().recipeID, ProfessionsFrame.CraftingPage:GetCraftableCount(), ProfessionsFrame.CraftingPage.SchematicForm:GetCurrentRecipeLevel())
+    else
+        maxStackSize = maxStackSize or 1000
+        C_TradeSkillUI.CraftSalvage( craft_id , maxStackSize , ItemLocation:CreateFromBagAndSlot( bag , slot ))
+    end
+
 end
 
 -- Method:          Crafting.GetSalveItemDetails( bool )
@@ -150,10 +161,17 @@ end
 --                  First slot if it fails rather than the selected slot.
 Crafting.GetSalveItemDetails = function( restart_crafting )
 
-    local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item or type(item.debugItemID) ~= "number" then
-        return;
+    local item;
+    local item_id = salvage_item_id;
+    if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
+        item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
+        if not item or type(item.debugItemID) ~= "number" then
+            return;
+        else
+            item_id = item.debugItemID;
+        end
     end
+
 
     -- This is failing, so add stacks to first slot (compensates for positioning bug of not crafting the item you selected, but first in slot)
     if restart_crafting then
@@ -163,45 +181,72 @@ Crafting.GetSalveItemDetails = function( restart_crafting )
             for slot = 1, C_Container.GetContainerNumSlots( bag ) do
                 item_detail = C_Container.GetContainerItemInfo( bag , slot )
 
-                if item_detail and item_detail.itemID == item.debugItemID then
-                    return { bag , slot , item_detail.stackCount } , item.debugItemID;
+                if item_detail and item_detail.itemID == item_id then
+                    return { bag , slot , item_detail.stackCount } , item_id;
                 end
             end
         end
 
         -- Crafts the selected item in the salvage box.
     else
-        local id = item.debugItemID;
-        local itemDetails = item:GetItemLocation();
+        local itemDetails;
+        local stack_count = 0;
+
+        -- This is technically better as it focuses on the actually selected herbs, not just first
+        if item then
+            itemDetails = item:GetItemLocation();
+            if itemDetails then
+                stack_count = C_Container.GetContainerItemInfo( itemDetails.bagID , itemDetails.slotIndex ).stackCount
+            end
+        else
+            local stack_size, bag, slot = Crafting.GetFirstReagentSizeStack( item_id );
+            if stack_size then
+                itemDetails = {};
+                itemDetails.bagID = bag;
+                itemDetails.slotIndex = slot;
+                stack_count = stack_size;
+            end
+        end
 
         if itemDetails then
-            local bag , slot = itemDetails.bagID , itemDetails.slotIndex;
-            return { bag , slot , C_Container.GetContainerItemInfo( bag , slot ).stackCount } , id;
+            return { itemDetails.bagID , itemDetails.slotIndex , stack_count } , item_id;
         end
     end
-
 end
 
--- Method:          Crafting.GetFirstReagentSizeStack()
+-- Method:          Crafting.GetFirstReagentSizeStack( int )
 -- What it Does:    Returns the stack count of the first slot in the bags where the reagent is
 -- Purpose:         Need to know how many in the stack if going to initialize reagent stacking immediately.
-Crafting.GetFirstReagentSizeStack = function()
-    local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item or type(item.debugItemID) ~= "number" then
-        return;
+Crafting.GetFirstReagentSizeStack = function( item_id )
+    if salvage_item_id == 0 and MSA.SC.g_item_id > 0 then
+        salvage_item_id = MSA.SC.g_item_id;
+    end
+
+    item_id = item_id or salvage_item_id;
+    if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
+        local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
+        if not item or type(item.debugItemID) ~= "number" then
+            return;
+        else
+            item_id = item.debugItemID;
+        end
     end
 
     local item_info = {}
 
     for bag = 0 , NUM_BAG_SLOTS + 1 do  -- Loop through all bags + reagent bag
-        for slot = 1, C_Container.GetContainerNumSlots( bag ) do
-            item_info = C_Container.GetContainerItemInfo( bag , slot )
+        if not count then
+            for slot = 1, C_Container.GetContainerNumSlots( bag ) do
+                item_info = C_Container.GetContainerItemInfo( bag , slot )
 
-            if item_info and item_info.itemID == item.debugItemID then
-                return item_info.stackCount
+                if item_info and item_info.itemID == item_id then
+
+                    return item_info.stackCount , bag , slot
+                end
             end
         end
     end
+    return
 end
 
 -- Method:          Crafting.Is_More_To_Craft( int )
@@ -210,12 +255,17 @@ end
 --                  crafts remaining. Or, even you get a resourcefulness proc and now have extra to craft at the end. This will do a
 --                  quick bag check if crafting should be continued again after crafting.
 Crafting.Is_More_To_Craft = function( craft_id )
-    local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
-    if not item or type(item.debugItemID) ~= "number" then
-        return false;
+    local item_id = salvage_item_id;
+    if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
+        local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
+        if not item or type(item.debugItemID) ~= "number" then
+            return;
+        else
+            item_id = item.debugItemID;
+        end
     end
 
-    local max_stack_size = C_Item.GetItemMaxStackSizeByID(item.debugItemID);
+    local max_stack_size = C_Item.GetItemMaxStackSizeByID(item_id);
     local default_stack_min = Crafting.Get_Reagent_Count_Spell(craft_id);
     local total_count = 0;
     local first_stack_count = 0;
@@ -234,7 +284,7 @@ Crafting.Is_More_To_Craft = function( craft_id )
 
             -- Establish the first stack size and the total amoutn
             -- We do this because I need to know if there are additional items in the bags to be stacked.
-            if item_info and item_info.itemID == item.debugItemID then
+            if item_info and item_info.itemID == item_id then-- item.debugItemID then
                 if first_stack_count == 0 then
                     first_stack_count = item_info.stackCount;
                 end
@@ -254,39 +304,49 @@ Crafting.Is_More_To_Craft = function( craft_id )
     return needs_to_stack , more_to_craft
 end
 
--- Method:          Crafting.is_reagent_bag_open()
--- What it Does:    Returns true of the reagent bag is open
--- Purpose:         To know which bank tab to sort the reagents in
-Crafting.is_reagent_bag_open = function()
-    if BankFrame:IsShown() and BankFrame.selectedTab == 2 then
-        return true
-    else
-        return false
-    end
-end
-
--- Method:          Crafting.is_warband_bank_open()
--- What it Does:    Returns true of the Warband bag is open
--- Purpose:         To know which bank tab to sort the reagents in
-Crafting.is_warband_bank_open = function()
-    if BankFrame:IsShown() and BankFrame.selectedTab == 3 then      -- This selectedTab works both for Bank and the Distance Inhibitor
-        return true
-    else
-        return false
-    end
-end
-
 -- Method:          Crafting.CraftListener ( int )
 -- What it Does:    Acts as an event listener to control when to trigger the reagent stacking action
 -- Purpose:         Quality of life helper for mass Crafting.
 Crafting.CraftListener = function ( craft_id )
     if MSA_save.non_stop and not combiningStacks then
-        local first_stack = Crafting.GetFirstReagentSizeStack()
         local remaining_casts = C_TradeSkillUI.GetRemainingRecasts()
 
-        -- Note: Get CraftableCount is minus 2 to accomodate for API counting mismatch, it's always 1 less because you just crafted, and there is a 1 count lag,
-        if ( remaining_casts and remaining_casts < 25 ) or ( first_stack and first_stack < 100 ) then
-            Crafting.CombineStacks( nil , nil , nil , craft_id );
+        if ( remaining_casts and remaining_casts < 25 ) then
+            Crafting.CombineStacks( nil , nil , nil , nil , craft_id );
+        else
+            -- I separate these so I don't pull first reagent logic if not needed
+            local first_stack , bag , slot = Crafting.GetFirstReagentSizeStack()
+
+            if first_stack then
+                if first_stack < 125 then
+                    Crafting.CombineStacks( nil , nil , nil , nil , craft_id );
+
+                elseif not ProfessionsFrame or (ProfessionsFrame and not ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() ) and C_TradeSkillUI.IsRecipeRepeating() then
+                    -- ONLY RUN THIS LOGIC IF PROFESSION WINDOW IS NOT OPEN
+                    -- There is a bug where the CraftSalvage function seems to swap stacks even if you never selected it to
+                    -- This compensates that by refreshing it more frequently.
+
+                    local default_stack_min = Crafting.Get_Reagent_Count_Spell(craft_id);
+                    local stack_num_rounded = ( math.floor ( ( first_stack + (default_stack_min/2) ) / default_stack_min ) * default_stack_min )    -- For mod % check == 0
+                    local mod_val = 100;
+
+                    if salvage_item_id ~= 0 then
+                        local max_stack_size = C_Item.GetItemMaxStackSizeByID ( salvage_item_id )
+                        if max_stack_size and max_stack_size < 1000 then
+                            if ( default_stack_min * 20 ) >= ( max_stack_size / 2 ) then
+                                mod_val = math.floor( max_stack_size / 4 )
+                            else
+                                mod_val = math.floor ( default_stack_min * 20 )
+                            end
+                        end
+
+                    end
+
+                    if stack_num_rounded % mod_val == 0 then
+                        Crafting.Refresh_Crafting( craft_id , nil , bag , slot  );
+                    end
+                end
+            end
         end
     end
 end
@@ -305,27 +365,58 @@ Crafting.IsMassCraftingSpell = function( craft_id )
     return false
 end
 
+local repeat_tracking = false
+-- Method:          Crafting.RepeatingListener()
+-- What it Does:    Acts as an active listener for mass salvaging
+-- Purpose:         so that the item_id is only recorded a single time,
+--                  at the start of mass salvaging, then cleared
+--                  when salvaging ends.
+Crafting.RepeatingListener = function()
+    if not repeat_tracking then
+        record_next = true;
+        repeat_tracking = true
+    elseif not C_TradeSkillUI.IsRecipeRepeating() then
+        repeat_tracking = false;
+        record_next = false;
+        salvage_item_id = 0;
+        MSA.SC.g_item_id = 0;
+        return;
+    end
+
+    C_Timer.After( 0.1 , Crafting.RepeatingListener )
+end
+
 -- Event listener to account for actions to know when to align conditions to begin stacking the reagents in bags.
 local CraftingFrame = CreateFrame( "FRAME" , "MSA_CraftingListener" );
 CraftingFrame:RegisterEvent( "TRADE_SKILL_CRAFT_BEGIN" );
 CraftingFrame:RegisterEvent( "UNIT_SPELLCAST_FAILED" );
+CraftingFrame:RegisterEvent( "ITEM_COUNT_CHANGED" );
 CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed_id )
 
     if event == "TRADE_SKILL_CRAFT_BEGIN" then
         if Crafting.IsMassCraftingSpell ( craft_id ) then
+
+            if not repeat_tracking then
+                Crafting.RepeatingListener();
+            end
+
             Crafting.CraftListener(craft_id);
         end
 
     elseif event == "UNIT_SPELLCAST_FAILED" and MSA_save.non_stop and Crafting.IsMassCraftingSpell ( failed_id ) and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
-        local needs_to_stack , more_to_craft = Crafting.Is_More_To_Craft();
+        local needs_to_stack , more_to_craft = Crafting.Is_More_To_Craft(failed_id);
 
         -- Do we need to restack herbs and restart, or do we need to just restart
         if needs_to_stack then
-            Crafting.CombineStacks( nil , nil , true , craft_id );
+            Crafting.CombineStacks( nil , nil , nil , true , failed_id );
 
         elseif more_to_craft then
-            print("MSA: Crafting has ended prematurely. Please restart and crafting will continue nonstop." )
+            print("MSA - Crafting has ended prematurely. Please restart and crafting will continue nonstop" )
         end
+
+    elseif event == "ITEM_COUNT_CHANGED" and record_next then
+        salvage_item_id = craft_id;
+        record_next = false;
     end
 
 end);

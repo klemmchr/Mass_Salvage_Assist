@@ -21,11 +21,24 @@ local LoadSettings = function( reset_settings )
     if MSA_save.non_stop == nil then
         MSA_save.non_stop = true
     end
+    if MSA_save.pos == nil then
+        MSA_save.pos = { "TOP" , "TOP" , 0 , -50 }  -- Default position top of the window
+    end
+
+    if MSA_save.count_bags_Only  == nil then        -- Only applies when Salvaging
+        MSA_save.count_bags_Only = true
+    end
+
+    if MSA_save.always_show == nil then
+        MSA_save.always_show = true
+    end
 end
 
 ------------------------
 ---- INITIALIZATION ----
 ------------------------
+local addon_loaded = false;
+local professions_loaded = false;
 
 -- Method:          InitializeAddon()
 -- What it Does:    Initializes the variables, ensures save variablea are formatted
@@ -33,14 +46,16 @@ end
 local InitializeAddon = function()
     if MSA.UI and MSA.UI.LoadUI then
         LoadSettings();
-        if ProfessionsFrame then        -- In the case another addon has already pre-loaded the professions frame, this will force UI to load too.
+        MSA.Crafting.Establish_Spells();
+        -- Don't need profession window
+        MSA.UI.Deploy_Timer_UI();
+        addon_loaded = true;
+
+        if professions_loaded then
             MSA.UI.LoadUI();
             MSA.Initialization:UnregisterAllEvents();
             MSA.Initialization = nil;
-        else
-            MSA.Initialization:UnregisterEvent("PLAYER_ENTERING_WORLD");
         end
-
     else
         C_Timer.After ( 1 , MSA.InitializeAddon)
     end
@@ -53,17 +68,20 @@ local ActivateAddon = function ( _ , event , addon )
     if event == "ADDON_LOADED" then
     -- initiate addon once all variable are loaded.
         if addon == ADDON_NAME then
-            MSA.Initialization:RegisterEvent ( "PLAYER_ENTERING_WORLD" ); -- Ensures this check does not occur until after Addon is fully loaded. By registering, it acts recursively throug hthis method
+            InitializeAddon();
         elseif addon == "Blizzard_Professions" then
-            MSA.UI.LoadUI();
-            MSA.Initialization:UnregisterAllEvents();
-            MSA.Initialization = nil;
+            professions_loaded = true;
+
+            if addon_loaded then
+                MSA.UI.LoadUI();
+                MSA.Initialization:UnregisterAllEvents();
+                MSA.Initialization = nil;
+            end
         end
-    elseif event == "PLAYER_ENTERING_WORLD" then
-        InitializeAddon();
     end
 end
 
 MSA.Initialization = CreateFrame ( "Frame" );
 MSA.Initialization:RegisterEvent ( "ADDON_LOADED" );
 MSA.Initialization:SetScript ( "OnEvent" , ActivateAddon );
+MSA.Initialization.ProfessionsLoaded = false;

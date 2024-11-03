@@ -1,4 +1,18 @@
 
+## **Mass Salvage Assist - Version 1.0.5 - Nov 1st, 2024
+
+***QUALITY OF LIFE IMPROVEMENTS***
+
+* When using the macros/slash command to craft, if nonstop salvaging is currently disabled, it will now inform you.
+
+* You can now `/msa enable` or `/msa disable` to turn on and off the nonstop salvaging.
+
+* All skinning refine spells have been added to the nonstop crafting.
+
+***BUG FIXES***
+
+* Fixed a bug where the addon would cause Lua errors when doing other various tasks in the game if you have not yet opened the professions window. This is because it was on-demand loading certain frames
+
 ## **Mass Salvage Assist - Version 1.0.4 - Oct 31st, 2024
 
 *I was unaware of the memory leak issue on Blizz's end where when crafting the addon memory usage can go through the roof. While it still does proper garbage collection, it still consumes massive amounts of memory when using professions. This isn't a huge deal, except if you are on a PC where Frames start to slow down, and it gets choppy, this can actually end up interrupting nonstop crafting. So, I was informed by a few people that there is actually this workaround people developed to bypass this memory issue by way of using macros. You can start salvaging with a macro rather than ever opening the player window. I have decided to implement this type of adaptation support to this addon as well.*

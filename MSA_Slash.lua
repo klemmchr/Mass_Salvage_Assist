@@ -33,6 +33,16 @@ SlashCmdList["MSA"] = function(input)
             SC.Help()
         elseif command[1] == "craft" then
             print('Invalid Format: Please type \'/msa craft recipe_id item_id\'\nExample: /msa craft 382981 191461')
+
+        elseif command[1] == "enable" then
+            SC.Enable()
+
+        elseif command[1] == "disable" then
+            SC.Disable()
+
+        elseif command[1] == "timer" then
+            SC.Timer()
+
         else
             SC.Error();
         end
@@ -177,10 +187,53 @@ SC.Craft = function( recipe_id , item_id )
                     C_Container.PickupContainerItem( bag , slot )
                     C_TradeSkillUI.CraftSalvage( recipe_id, C_Item.GetItemMaxStackSizeByID( item_id ), ItemLocation:CreateFromBagAndSlot( bag, slot) )
                     ClearCursor()
+
+                    if not MSA_save.non_stop then
+                        print( "MSA:" .. " " .. "Nonstop crafting is currently disabled. Please type \'/msa enable\' to continue nonstop." )
+                    end
                     return
                 end
             end
         end
+    end
+end
+
+-- Method:          SC.Enable()
+-- What it Does:    Enables nonstop salvaging
+SC.Enable = function()
+    if not MSA_save.non_stop then
+        MSA_save.non_stop = true
+        if MSA.UI.MSA_checkbox and MSA.UI.MSA_checkbox:IsVisible() then
+            MSA.UI.MSA_checkbox:SetChecked(MSA_save.non_stop);
+        end
+        print( "MSA:" .. " " .. "Nonstop crafting has been enabled" )
+    else
+        print( "MSA:" .. " " .. "Nonstop crafting is already enabled" )
+    end
+end
+
+-- Method:          SC.Enable()
+-- What it Does:    Disables nonstop salvaging
+SC.Disable = function()
+    if MSA_save.non_stop then
+        MSA_save.non_stop = false
+        if MSA.UI.MSA_checkbox and MSA.UI.MSA_checkbox:IsVisible() then
+            MSA.UI.MSA_checkbox:SetChecked(MSA_save.non_stop);
+        end
+        print( "MSA:" .. " " .. "Nonstop crafting has been disabled" )
+    else
+        print( "MSA:" .. " " .. "Nonstop crafting is already disabled" )
+    end
+end
+
+-- Method:          SC.Timer()
+-- What it Does:    Controls easy showing of the Timer window
+-- Purpose:         Just Quality of life stuff
+SC.Timer = function()
+    if MSA.UI.CT_Core_Frame:IsVisible() then
+        MSA.UI.CT_Core_Frame:Hide()
+    else
+        MSA.UI.CT_Core_Frame:Show();
     end
 end
 
@@ -195,4 +248,8 @@ SC.Help = function()
     print('- /msa craft recipe_id item_id')
     print('- /msa craft 382981 191461')
     print("\n")
+    print("- /msa enable - Turn on endless salvaging")
+    print("- /msa disable - Turn off endless salvaging")
 end
+
+-- /run ProfessionsFrame.CraftingPage.CraftingOutputLog:Cleanup()

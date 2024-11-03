@@ -9,3 +9,4 @@ MSA_Core.lua
 MSA_Crafting.lua
 MSA_UI.lua
 MSA_Slash.lua
+MSA_Craft_Timer.lua

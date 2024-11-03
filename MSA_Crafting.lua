@@ -2,11 +2,10 @@
 local Crafting = {};
 MSA.Crafting = Crafting;
 
+-- Useful globals I haven't put in a tablet yet...
 local combiningStacks = false;
-
--- This is for tracking the item ID being salvaged since API cannot grab it without profession
---  window being oepn. This accomodates people who macro craft without using the window
 local record_next = false;
+local repeat_tracking = false
 local salvage_item_id = 0;
 
 -- Method:          Crafting.Establish_Spells()
@@ -16,12 +15,12 @@ local salvage_item_id = 0;
 Crafting.Establish_Spells = function()
     Crafting.Profs = {}
     Crafting.Profs.MillingSpells = {
-        [444181] = 5, [382981] = 5, [382982] = 5, [382984] = 5,
+        [444181] = 10, [382981] = 5, [382982] = 5, [382984] = 5,
         [382986] = 5, [382987] = 5, [382988] = 5, [382989] = 5,
         [382990] = 5, [382991] = 5, [382994] = 5
     }
     Crafting.Profs.Jewelcrafting = {
-        [434018] = 5, [434020] = 3, [374627] = 5, [395696] = 5, [325248] = 5,
+        [434018] = 5, [434020] = 3, [374627] = 5, [395696] = 3, [325248] = 5,
         [382973] = 5, [382975] = 5, [382977] = 5, [382978] = 5, [404740] = 3,
         [382979] = 5, [382980] = 5, [382995] = 5
     }
@@ -42,6 +41,11 @@ Crafting.Establish_Spells = function()
     }
     Crafting.Profs.Enchanting = {
         [470726] = 1
+    }
+    Crafting.Profs.Skinning = {
+        [440929] = 5, [440937] = 5, [440938] = 5, [375731] = 5, [440934] = 5,
+        [375763] = 5, [376612] = 5, [376613] = 5, [376614] = 5, [440942] = 5,
+        [440943] = 5, [376611] = 5
     }
 end
 
@@ -365,7 +369,6 @@ Crafting.IsMassCraftingSpell = function( craft_id )
     return false
 end
 
-local repeat_tracking = false
 -- Method:          Crafting.RepeatingListener()
 -- What it Does:    Acts as an active listener for mass salvaging
 -- Purpose:         so that the item_id is only recorded a single time,
@@ -403,7 +406,7 @@ CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed
             Crafting.CraftListener(craft_id);
         end
 
-    elseif event == "UNIT_SPELLCAST_FAILED" and MSA_save.non_stop and Crafting.IsMassCraftingSpell ( failed_id ) and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
+    elseif event == "UNIT_SPELLCAST_FAILED" and Crafting.Profs and Crafting.IsMassCraftingSpell ( failed_id ) and MSA_save.non_stop and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
         local needs_to_stack , more_to_craft = Crafting.Is_More_To_Craft(failed_id);
 
         -- Do we need to restack herbs and restart, or do we need to just restart

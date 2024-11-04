@@ -1,9 +1,18 @@
 
-## **Mass Salvage Assist - Version 1.0.5 - Nov 1st, 2024
+## **Mass Salvage Assist - Version 1.0.5 - Nov 3rd, 2024
+
+***NEW FEATURE - CRAFTING TIMER***
+
+* This works with ALL profession crafting, not just salvaging recipes.
+* In the case of salvaging recipes, an additional option will be included to only calculate the time remaining based on just reagents in bags.
+* A button has been added to the professions window to open/close the crafting window, but it will also auto-open on start, and close on finish
+* You can also `/msa timer` to show/hide the timer window.
+
+![Crafting Timer](https://i.imgur.com/6vkRNcz.jpeg)
 
 ***QUALITY OF LIFE IMPROVEMENTS***
 
-* When using the macros/slash command to craft, if nonstop salvaging is currently disabled, it will now inform you.
+* When using the slash command/macro to craft, if nonstop salvaging is currently disabled, it will now inform you.
 
 * You can now `/msa enable` or `/msa disable` to turn on and off the nonstop salvaging.
 
@@ -16,6 +25,7 @@
 * Fixed a bug where the addon would cause Lua errors when doing other various tasks in the game if you have not yet opened the professions window. This is because it was on-demand loading certain frames
 
 * Fixed an issue when crafting with macros it sometimes would be point to the wrong bag slot item to salvage and interrupt crafting.
+
 
 ## **Mass Salvage Assist - Version 1.0.4 - Oct 31st, 2024
 
@@ -44,6 +54,7 @@
 * Coreway Catalysts spell added for Alchemy
 
 * Gleaming Shatter added for Enchanting
+
 
 ## **Mass Salvage Assist - Version 1.0.2 - Oct 29th, 2024
 

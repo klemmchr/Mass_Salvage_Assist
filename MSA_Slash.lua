@@ -184,6 +184,13 @@ SC.Craft = function( recipe_id , item_id )
                 if item_link:IsValid() and C_Item.GetItemID(item_link) == item_id then
                     -- Item secured, let's build to craft
                     SC.g_item_id = item_id;
+
+                    if MSA.Crafting.IsMassCraftingSpell(recipe_id) then
+                        MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
+                    else
+                        MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()
+                    end
+
                     C_Container.PickupContainerItem( bag , slot )
                     C_TradeSkillUI.CraftSalvage( recipe_id, C_Item.GetItemMaxStackSizeByID( item_id ), ItemLocation:CreateFromBagAndSlot( bag, slot) )
                     ClearCursor()
@@ -248,8 +255,9 @@ SC.Help = function()
     print('- /msa craft recipe_id item_id')
     print('- /msa craft 382981 191461')
     print("\n")
-    print("- /msa enable - Turn on endless salvaging")
+    print("- /msa enable  - Turn on endless salvaging")
     print("- /msa disable - Turn off endless salvaging")
+    print("- /msa timer    - Show or Hide the Crafting Timer")
 end
 
 -- /run ProfessionsFrame.CraftingPage.CraftingOutputLog:Cleanup()

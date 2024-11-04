@@ -9,9 +9,13 @@
 
 * All skinning refine spells have been added to the nonstop crafting.
 
+* Enchanting Recipe *Shatter Essence* is now fully supported
+
 ***BUG FIXES***
 
 * Fixed a bug where the addon would cause Lua errors when doing other various tasks in the game if you have not yet opened the professions window. This is because it was on-demand loading certain frames
+
+* Fixed an issue when crafting with macros it sometimes would be point to the wrong bag slot item to salvage and interrupt crafting.
 
 ## **Mass Salvage Assist - Version 1.0.4 - Oct 31st, 2024
 

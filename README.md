@@ -29,10 +29,19 @@ Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass 
     -
     - You can also get help:
     - /msa help
+    - /msa enable   - Turn on endless salvaging"
+    - /msa disable  - Turn off endless salvaging"
+    - /msa timer     - Show or Hide the Crafting Timer"
 
 ![Example](https://i.imgur.com/8r91gAQ.gif)
 
-![New Feature](https://i.imgur.com/KdEo4ZG.png)
+**CRAFTING TIMER**
+
+* This works with ALL profession crafting, not just salvaging recipes.
+* In the case of salvaging recipes, an additional option will be included to only calculate the time remaining based on just reagents in bags.
+
+![Crafting Timer](https://i.imgur.com/6vkRNcz.jpeg)
+
 
 **LIMITATIONS**
 

@@ -18,10 +18,10 @@ CT.Get_Avg_Craft_Time = function()
     return ( sum / #CT.timer_table ) ;
 end
 
--- Method:          formatTime ( int )
+-- Method:          CT.formatTime ( int )
 -- What it Does:    Creates a nice countdown of how much time is remaining
 -- Purpose:         Quality of Life information
-local function formatTime (seconds)
+CT.formatTime = function(seconds)
     if seconds < 60 then
         -- Less than a minute
         return string.format("%d seconds", seconds)
@@ -40,6 +40,23 @@ local function formatTime (seconds)
     end
 end
 
+-- Method:          CT.Get_Craftable_Count()
+-- What it Does:    Returns the craftable count based on settings
+-- Purpose:         Change Calculation for countdown.
+CT.Get_Craftable_Count = function()
+    local count = 0;
+
+    if MSA_save.count_bags_Only and MSA.Crafting.IsMassCraftingSpell(MSA.UI.CT_Core_Frame.craft_id) then
+        count = MSA.Crafting.Get_Remaining_Count_Bags();
+        -- Now that we have a count, we need to multiply it by Salvage spell amount
+        count = math.floor ( (count / MSA.Crafting.Get_Reagent_Count_Spell (MSA.UI.CT_Core_Frame.craft_id) + 0.5 ) );
+    else
+        count = C_TradeSkillUI.GetCraftableCount(MSA.UI.CT_Core_Frame.craft_id);
+    end
+
+    return count
+end
+
 -- Method:          CT.Calculate_Remaining_Time()
 -- What it Does:    Returns the estimated total crafting time of the item currently
 --                  being processed
@@ -47,9 +64,9 @@ end
 CT.Calculate_Remaining_Time = function()
     if #CT.timer_table > 9 then
         local avg = CT.Get_Avg_Craft_Time();
-        local seconds = math.floor ( (avg * C_TradeSkillUI.GetCraftableCount(MSA.UI.CT_Core_Frame.craft_id)) + 0.5 );
+        local seconds = math.floor ( (avg * CT.Get_Craftable_Count()) + 0.5 ); -- Math.floor always rounds down, so ensure +0.5 to fix rounding.
         MSA.UI.CT_Core_Frame.value = seconds;
-        MSA.UI.CT_Core_Frame.Countdown_Text:SetText( formatTime ( seconds ) );
+        MSA.UI.CT_Core_Frame.Countdown_Text:SetText( CT.formatTime ( seconds ) );
     end
 end
 
@@ -74,52 +91,65 @@ local function Trade_Skill_Craft_Record()
     end
 end
 
-local msa_timer = CreateFrame( "FRAME" , "MSA_Crafting_Timer" )
-msa_timer:RegisterEvent("TRADE_SKILL_CRAFT_BEGIN")
-msa_timer:SetScript("OnEvent", function( _ , event , craft_id )
-    if event == "TRADE_SKILL_CRAFT_BEGIN" then
-        Trade_Skill_Craft_Record()
-        MSA.UI.CT_Core_Frame.craft_id = craft_id
-
-        if #CT.timer_table > 0 then
-
-            if #CT.timer_table < 10 then
-                MSA.UI.CT_Core_Frame.Countdown_Text:SetText( "Calculating..." )
-            elseif MSA.UI.CT_Core_Frame.value == 0 then
-                CT.Calculate_Remaining_Time();
-                CT.Initialize_Countdown();
-            end
-        end
-    end
-end)
-
 local countdown_running = false;
 -- TIMER FOR FRAME TRACKING UPDATES
 CT.Initialize_Countdown = function( isRepeating )
     if not countdown_running or isRepeating then
         countdown_running = true;
 
-        local count_remaining = C_TradeSkillUI.GetCraftableCount(MSA.UI.CT_Core_Frame.craft_id);
-        MSA.UI.CT_Core_Frame.refresh_count = MSA.UI.CT_Core_Frame.refresh_count + 1;
-        if MSA.UI.CT_Core_Frame.refresh_count == 300 or count_remaining < 100 and count % 20 == 0 then   -- Recalculate every 5 min, or every 20 crafts last 100
+        if #CT.timer_table < 10 then
+            MSA.UI.CT_Core_Frame.Countdown_Text:SetText( "Calculating..." )
+        elseif MSA.UI.CT_Core_Frame.value == 0 then
             CT.Calculate_Remaining_Time();
-            MSA.UI.CT_Core_Frame.refresh_count = 0;
+        else
+            local count_remaining = CT.Get_Craftable_Count();
+            MSA.UI.CT_Core_Frame.refresh_count = MSA.UI.CT_Core_Frame.refresh_count + 1;
+            if MSA.UI.CT_Core_Frame.refresh_count == 300 or count_remaining < 100 and count_remaining % 20 == 0 then   -- Recalculate every 5 min, or every 20 crafts last 100
+                CT.Calculate_Remaining_Time();
+                MSA.UI.CT_Core_Frame.refresh_count = 0;
+            end
+
+            MSA.UI.CT_Core_Frame.Countdown_Text:SetText( CT.formatTime ( MSA.UI.CT_Core_Frame.value ) );
+            MSA.UI.CT_Core_Frame.value = MSA.UI.CT_Core_Frame.value - 1;
         end
 
-        MSA.UI.CT_Core_Frame.Countdown_Text:SetText( formatTime ( MSA.UI.CT_Core_Frame.value ) );
-        MSA.UI.CT_Core_Frame.value = MSA.UI.CT_Core_Frame.value - 1;
         C_Timer.After ( 1 , function()
             if C_TradeSkillUI.IsRecipeRepeating() then
                 CT.Initialize_Countdown( true );
             else
-                C_Timer.After ( 2 , function()
-                    CT.timer_table = {};
-                    MSA.UI.CT_Core_Frame.value = 0;
-                    MSA.UI.CT_Core_Frame.craft_id = 0;
-                    countdown_running = false;
-                    MSA.UI.CT_Core_Frame:Hide();
-                end)
+                -- Crafting Stopped - Reset values
+                CT.timer_table = {};
+                MSA.UI.CT_Core_Frame.value = 0;
+                MSA.UI.CT_Core_Frame.craft_id = 0;
+                countdown_running = false;
+                timestamp = 0
+                MSA.UI.CT_Core_Frame.Countdown_Text:SetText("");
+                MSA.UI.CT_Core_Frame:Hide();
             end
         end)
     end
 end
+
+local msa_timer = CreateFrame( "FRAME" , "MSA_Crafting_Timer" )
+msa_timer.craft_id = 0;
+msa_timer:RegisterEvent("TRADE_SKILL_CRAFT_BEGIN")
+msa_timer:RegisterEvent("SPELL_DATA_LOAD_RESULT")
+msa_timer:SetScript("OnEvent", function( _ , event , craft_id )
+    if event == "TRADE_SKILL_CRAFT_BEGIN" then
+        Trade_Skill_Craft_Record()
+
+        if MSA.UI.CT_Core_Frame.craft_id ~= craft_id then
+            MSA.UI.CT_Core_Frame.craft_id = craft_id
+            CT.Initialize_Countdown();
+        end
+    elseif event == "SPELL_DATA_LOAD_RESULT" then
+        if msa_timer.craft_id ~= craft_id then
+            msa_timer.craft_id = craft_id;
+            if MSA.Crafting.IsMassCraftingSpell(craft_id) then
+                MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
+            else
+                MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()
+            end
+        end
+    end
+end)

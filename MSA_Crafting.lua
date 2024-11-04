@@ -40,7 +40,7 @@ Crafting.Establish_Spells = function()
         [447310] = 5, [447311] = 5
     }
     Crafting.Profs.Enchanting = {
-        [470726] = 1
+        [470726] = 1, [445466] = 1
     }
     Crafting.Profs.Skinning = {
         [440929] = 5, [440937] = 5, [440938] = 5, [375731] = 5, [440934] = 5,
@@ -166,7 +166,13 @@ end
 Crafting.GetSalveItemDetails = function( restart_crafting )
 
     local item;
-    local item_id = salvage_item_id;
+    local item_id;
+
+    if MSA.SC.g_item_id ~= 0 then
+        item_id = MSA.SC.g_item_id;
+    else
+        item_id = salvage_item_id;
+    end
     if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
         item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
         if not item or type(item.debugItemID) ~= "number" then
@@ -222,11 +228,13 @@ end
 -- What it Does:    Returns the stack count of the first slot in the bags where the reagent is
 -- Purpose:         Need to know how many in the stack if going to initialize reagent stacking immediately.
 Crafting.GetFirstReagentSizeStack = function( item_id )
-    if salvage_item_id == 0 and MSA.SC.g_item_id > 0 then
-        salvage_item_id = MSA.SC.g_item_id;
+    if not item_id then
+        if MSA.SC.g_item_id ~= 0 then
+            item_id = MSA.SC.g_item_id;
+            salvage_item_id = MSA.SC.g_item_id;
+        end
     end
 
-    item_id = item_id or salvage_item_id;
     if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
         local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
         if not item or type(item.debugItemID) ~= "number" then
@@ -253,13 +261,65 @@ Crafting.GetFirstReagentSizeStack = function( item_id )
     return
 end
 
+-- Method:          Crafting.Get_Remaining_Count_Bags(int)
+-- What it Does:    Returns the count of all the items in the player bags based on given item_id
+--                  Or, it defaults to the selected salvage item ID being crafted.
+-- Purpose:         So a timer can be calculated not based on total items to craft, but just on what is in bags
+--                  So that the addon can make it's own timer based on that.
+Crafting.Get_Remaining_Count_Bags = function (item_id)
+    if not item_id then
+        if MSA.SC.g_item_id ~= 0 then
+            item_id = MSA.SC.g_item_id;
+            salvage_item_id = MSA.SC.g_item_id;
+        else
+            item_id = salvage_item_id;
+        end
+    end
+    local total_count = 0
+
+    if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
+        local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
+        if not item or type(item.debugItemID) ~= "number" then
+            return total_count;
+        else
+            item_id = item.debugItemID;
+        end
+    end
+
+    if item_id == 0 then
+        return total_count;
+    end
+
+    -- Let's see what's in our bags!
+    for bag = 0 , NUM_BAG_SLOTS + 1 do  -- Loop through all bags + reagent bag
+        for slot = 1, C_Container.GetContainerNumSlots( bag ) do
+            local item_info = C_Container.GetContainerItemInfo( bag , slot )
+
+            -- Establish the first stack size and the total amoutn
+            -- We do this because I need to know if there are additional items in the bags to be stacked.
+            if item_info and item_info.itemID == item_id then-- item.debugItemID then
+                total_count = total_count + item_info.stackCount;
+            end
+        end
+    end
+
+    return total_count
+end
+
 -- Method:          Crafting.Is_More_To_Craft( int )
 -- What it Does:    Returns true if there are enough reagents to continue crafting
 -- Purpose:         There seems to be a common bug where crafting just stops for some reason when there is maybe only 20 or so
 --                  crafts remaining. Or, even you get a resourcefulness proc and now have extra to craft at the end. This will do a
 --                  quick bag check if crafting should be continued again after crafting.
 Crafting.Is_More_To_Craft = function( craft_id )
-    local item_id = salvage_item_id;
+    local item_id;
+
+    if MSA.SC.g_item_id ~= 0 then
+        item_id = MSA.SC.g_item_id;
+        salvage_item_id = MSA.SC.g_item_id;
+    else
+        item_id = salvage_item_id;
+    end
     if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
         local item = ProfessionsFrame.CraftingPage.SchematicForm:GetTransaction().salvageItem;
         if not item or type(item.debugItemID) ~= "number" then
@@ -333,9 +393,16 @@ Crafting.CraftListener = function ( craft_id )
                     local default_stack_min = Crafting.Get_Reagent_Count_Spell(craft_id);
                     local stack_num_rounded = ( math.floor ( ( first_stack + (default_stack_min/2) ) / default_stack_min ) * default_stack_min )    -- For mod % check == 0
                     local mod_val = 100;
+                    local item_id;
+                    if MSA.SC.g_item_id > 0 then
+                        item_id = MSA.SC.g_item_id;
+                        salvage_item_id = MSA.SC.g_item_id;
+                    else
+                        item_id = salvage_item_id;
+                    end
 
-                    if salvage_item_id ~= 0 then
-                        local max_stack_size = C_Item.GetItemMaxStackSizeByID ( salvage_item_id )
+                    if item_id ~= 0 then
+                        local max_stack_size = C_Item.GetItemMaxStackSizeByID ( item_id )
                         if max_stack_size and max_stack_size < 1000 then
                             if ( default_stack_min * 20 ) >= ( max_stack_size / 2 ) then
                                 mod_val = math.floor( max_stack_size / 4 )

@@ -43,6 +43,9 @@ SlashCmdList["MSA"] = function(input)
         elseif command[1] == "timer" then
             SC.Timer()
 
+        elseif command[1] == "reset" then
+            SC.Reset()
+
         else
             SC.Error();
         end
@@ -244,6 +247,15 @@ SC.Timer = function()
     end
 end
 
+-- Method:          SC.Reset()
+-- What it Does:    Resets the position of the timer to original position
+-- Purpose:         Useful if someone drags it off screen
+SC.Reset = function()
+    MSA_save.pos = { "TOP" , "TOP" , 0 , -5 }
+    MSA.UI.CT_Core_Frame:ClearAllPoints();
+    MSA.UI.CT_Core_Frame:SetPoint ( MSA_save.pos[1] , UIParent , MSA_save.pos[2] , MSA_save.pos[3] , MSA_save.pos[4] );
+end
+
 -- Method:          SC.Help()
 -- What it Does:    Prints out the slash commands available and how to use them
 -- Purpose:         Useful to have slash command help
@@ -258,6 +270,7 @@ SC.Help = function()
     print("- /msa enable  - Turn on endless salvaging")
     print("- /msa disable - Turn off endless salvaging")
     print("- /msa timer    - Show or Hide the Crafting Timer")
+    print("- /msa reset    - Resets timer position to default")
 end
 
 -- /run ProfessionsFrame.CraftingPage.CraftingOutputLog:Cleanup()

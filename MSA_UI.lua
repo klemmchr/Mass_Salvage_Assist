@@ -57,9 +57,9 @@ UI.LoadUI = function()
 
     if not UI.MSA_Timer_Button then
         --- TIMER BUTTON
-        UI.MSA_Timer_Button = CreateFrame ( "Button" , "MSA_Timer_Button" , ProfessionsFrame.CraftingPage , "UIPanelButtonTemplate" );
+        UI.MSA_Timer_Button = CreateFrame ( "Button" , "MSA_Timer_Button" , ProfessionsFrame.CraftingPage.SchematicForm , "UIPanelButtonTemplate" );
         UI.MSA_Timer_Button:SetSize( 100 , 20 );
-        UI.MSA_Timer_Button:SetPoint( "BOTTOMRIGHT" , ProfessionsFrame.CraftingPage , "BOTTOMRIGHT" , -12 , 40 )
+        UI.MSA_Timer_Button:SetPoint( "TOPRIGHT" , ProfessionsFrame.CraftingPage.SchematicForm , "TOPRIGHT" , -5 , -35 )
         UI.MSA_Timer_Button:SetText ( "Timer" );
 
         UI.MSA_Timer_Button:SetScript ( "OnClick" , function()
@@ -69,6 +69,16 @@ UI.LoadUI = function()
                 UI.CT_Core_Frame:Show();
             end
         end);
+
+        UI.MSA_Timer_Button:SetScript ( "OnEnter" , function( self )
+            GameTooltip:SetOwner ( self , "ANCHOR_CURSOR" );
+            GameTooltip:AddLine ( "Typing \'/msa timer\' to open/close also works." );
+            GameTooltip:Show();
+        end);
+
+        UI.MSA_Timer_Button:SetScript ( "OnLeave" , function()
+            GameTooltip:Hide()
+        end)
 
     end
 

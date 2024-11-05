@@ -84,14 +84,12 @@ local function Trade_Skill_Craft_Record()
         end
         timestamp = GetTime();
     else
-        if MSA_save.always_show then
-            MSA.UI.CT_Core_Frame:Show();
-        end
         CT.timer_table = {};
     end
 end
 
 local countdown_running = false;
+local window_triggered = false;
 -- TIMER FOR FRAME TRACKING UPDATES
 CT.Initialize_Countdown = function( isRepeating )
     if not countdown_running or isRepeating then
@@ -115,6 +113,14 @@ CT.Initialize_Countdown = function( isRepeating )
 
         C_Timer.After ( 1 , function()
             if C_TradeSkillUI.IsRecipeRepeating() then
+
+                if not window_triggered then
+                    window_triggered = true;
+                    if MSA_save.always_show then
+                        MSA.UI.CT_Core_Frame:Show();
+                    end
+                end
+
                 CT.Initialize_Countdown( true );
             else
                 -- Crafting Stopped - Reset values
@@ -123,6 +129,7 @@ CT.Initialize_Countdown = function( isRepeating )
                 MSA.UI.CT_Core_Frame.craft_id = 0;
                 countdown_running = false;
                 timestamp = 0
+                window_triggered= false;
                 MSA.UI.CT_Core_Frame.Countdown_Text:SetText("");
                 MSA.UI.CT_Core_Frame:Hide();
             end

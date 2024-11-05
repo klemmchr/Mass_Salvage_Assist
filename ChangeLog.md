@@ -1,4 +1,14 @@
 
+## **Mass Salvage Assist - Version 1.0.6 - Nov 5th, 2024
+
+* The timer window should now only appear automatically when doing a "create all" not just single item crafts
+
+* The timer button has been moved to not be in the way of other addons. It is now located in the top right corner. Added a tooltip as well with additional info.
+
+* You can now type `/msa reset` to reset the position of the timer window to default, in case you accidentally drag it off screen somehow.
+
+* The addon should now properly load no matter what other addons have been installed. There was an issue where craftsim was pre-loading some frames so some of the trogger event listeners I was using were not firing off because they had already been loaded prior to this addon even being loaded.
+
 ## **Mass Salvage Assist - Version 1.0.5 - Nov 3rd, 2024
 
 ***NEW FEATURE - CRAFTING TIMER***

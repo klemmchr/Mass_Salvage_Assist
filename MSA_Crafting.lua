@@ -49,7 +49,6 @@ Crafting.Establish_Spells = function()
     }
 end
 
-
 -- Method:          Crafting.Get_Reagent_Count_Spell ( int )
 -- What it Does:    Returns the number of reagents needed for that crafting spell
 -- Purpose:         When combining stacks, I want to always pick the lowest stack first, UNLESS it is small than the minimum stack size to craft
@@ -147,14 +146,12 @@ end
 -- What it Does:    Refreshes the Craft all/Mill All button
 -- Purpose:         Useful so stacks don't run out.
 Crafting.Refresh_Crafting = function( craft_id , maxStackSize , bag , slot )
-
     if ProfessionsFrame and ProfessionsFrame.CraftingPage.SchematicForm:IsVisible() then
         ProfessionsFrame.CraftingPage:CreateInternal(ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo().recipeID, ProfessionsFrame.CraftingPage:GetCraftableCount(), ProfessionsFrame.CraftingPage.SchematicForm:GetCurrentRecipeLevel())
     else
         maxStackSize = maxStackSize or 1000
         C_TradeSkillUI.CraftSalvage( craft_id , maxStackSize , ItemLocation:CreateFromBagAndSlot( bag , slot ))
     end
-
 end
 
 -- Method:          Crafting.GetSalveItemDetails( bool )
@@ -181,7 +178,6 @@ Crafting.GetSalveItemDetails = function( restart_crafting )
             item_id = item.debugItemID;
         end
     end
-
 
     -- This is failing, so add stacks to first slot (compensates for positioning bug of not crafting the item you selected, but first in slot)
     if restart_crafting then

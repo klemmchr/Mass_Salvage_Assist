@@ -22,7 +22,7 @@ local LoadSettings = function( reset_settings )
         MSA_save.non_stop = true
     end
     if MSA_save.pos == nil then
-        MSA_save.pos = { "TOP" , "TOP" , 0 , -50 }  -- Default position top of the window
+        MSA_save.pos = { "TOP" , "TOP" , 0 , -5 }  -- Default position top of the window
     end
 
     if MSA_save.count_bags_Only  == nil then        -- Only applies when Salvaging
@@ -38,7 +38,6 @@ end
 ---- INITIALIZATION ----
 ------------------------
 local addon_loaded = false;
-local professions_loaded = false;
 
 -- Method:          InitializeAddon()
 -- What it Does:    Initializes the variables, ensures save variablea are formatted
@@ -51,7 +50,7 @@ local InitializeAddon = function()
         MSA.UI.Deploy_Timer_UI();
         addon_loaded = true;
 
-        if professions_loaded then
+        if ProfessionsFrame then
             MSA.UI.LoadUI();
             MSA.Initialization:UnregisterAllEvents();
             MSA.Initialization = nil;
@@ -68,9 +67,9 @@ local ActivateAddon = function ( _ , event , addon )
     if event == "ADDON_LOADED" then
     -- initiate addon once all variable are loaded.
         if addon == ADDON_NAME then
+            print("Loading addon")
             InitializeAddon();
         elseif addon == "Blizzard_Professions" then
-            professions_loaded = true;
 
             if addon_loaded then
                 MSA.UI.LoadUI();

@@ -177,34 +177,56 @@ end
 -- Purpose:         There appears to be some kind of memory leak in the default Blizz profession frames
 --                  and by not having the profession window open, this prevents issues like frames loss.
 SC.Craft = function( recipe_id , item_id )
+    local smaller_stack = { -1 , 0 , 0 }
     for bag = 0 , NUM_BAG_SLOTS + 1 do  -- Loop through all bags + reagent bag
         for slot = 1, C_Container.GetContainerNumSlots( bag ) do
             local itemInfo = C_Container.GetContainerItemInfo( bag , slot )
             local default_stack_min = MSA.Crafting.Get_Reagent_Count_Spell( recipe_id );
 
-            if itemInfo and itemInfo.itemID == item_id and itemInfo.stackCount >= default_stack_min then   -- Don't pick the one not with at leat 1 stack
-                local item_link = ItemLocation:CreateFromBagAndSlot( bag, slot)
-                if item_link:IsValid() and C_Item.GetItemID(item_link) == item_id then
-                    -- Item secured, let's build to craft
-                    SC.g_item_id = item_id;
+            if itemInfo and itemInfo.itemID == item_id then
 
-                    if MSA.Crafting.IsMassCraftingSpell(recipe_id) then
-                        MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
-                    else
-                        MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()
+                if itemInfo.stackCount >= default_stack_min then   -- Don't pick the one not with at leat 1 stack
+                    local item_link = ItemLocation:CreateFromBagAndSlot( bag, slot)
+                    if item_link:IsValid() and C_Item.GetItemID(item_link) == item_id then
+                        -- Item secured, let's build to craft
+                        SC.g_item_id = item_id;
+
+                        if MSA.Crafting.IsMassCraftingSpell(recipe_id) then
+                            MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
+                        else
+                            MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()
+                        end
+
+                        C_Container.PickupContainerItem( bag , slot )
+                        C_TradeSkillUI.CraftSalvage( recipe_id, C_Item.GetItemMaxStackSizeByID( item_id ), ItemLocation:CreateFromBagAndSlot( bag, slot) )
+                        ClearCursor()
+
+                        if smaller_stack[1] ~= -1 then
+                            C_Timer.After ( 1 , function()
+                                print("MSA: Initial stack is too small. Stacks are being combined. One moment...")
+                                MSA.Crafting.CombineStacks ( smaller_stack , SC.g_item_id , true , false , recipe_id , true )
+                                SC.Nonstep_Disabled_Msg();
+                            end);
+                        else
+                            SC.Nonstep_Disabled_Msg();
+                        end
+
+                        return
                     end
-
-                    C_Container.PickupContainerItem( bag , slot )
-                    C_TradeSkillUI.CraftSalvage( recipe_id, C_Item.GetItemMaxStackSizeByID( item_id ), ItemLocation:CreateFromBagAndSlot( bag, slot) )
-                    ClearCursor()
-
-                    if not MSA_save.non_stop then
-                        print( "MSA:" .. " " .. "Nonstop crafting is currently disabled. Please type \'/msa enable\' to continue nonstop." )
-                    end
-                    return
+                elseif smaller_stack[1] == -1 and itemInfo.stackCount < default_stack_min then
+                    smaller_stack = { bag , slot , itemInfo.stackCount };
                 end
             end
         end
+    end
+end
+
+-- Method:          SC.Nonstep_Disabled_Msg()
+-- What  it Does:   Prints out a msg indicating the nonstop feature is disabled.
+-- Purpose:         Help players know when they use macro tool since checkbox is not visible.
+SC.Nonstep_Disabled_Msg = function()
+    if not MSA_save.non_stop then
+        print( "MSA:" .. " " .. "Nonstop crafting is currently disabled. Please type \'/msa enable\' to continue nonstop." )
     end
 end
 

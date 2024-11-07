@@ -67,7 +67,6 @@ local ActivateAddon = function ( _ , event , addon )
     if event == "ADDON_LOADED" then
     -- initiate addon once all variable are loaded.
         if addon == ADDON_NAME then
-            print("Loading addon")
             InitializeAddon();
         elseif addon == "Blizzard_Professions" then
 

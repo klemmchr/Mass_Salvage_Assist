@@ -1,4 +1,33 @@
 
+## **Mass Salvage Assist - Version 1.0.7 - Nov 7th, 2024
+
+**A NOTE ON DISTRIBUTION OF THIS ADDON, AND MY LEGAL LICENSING**
+
+I Added a License to this as I was approached by an entity who wanted to incorporate it into a paid addon that exists out there (I will refrain from naming). I have no plans to ever allow distribution of this wrapped within a paid addon. I appreciate they at least asked. All rights reserved to myself, the addon developer and sole creator, and I will keep it freely open to all, though I retain the rights of distribution through the channels I see fit as an open source and free addon. If you wish to incorporate some aspects of this into your FREE and openly available addon, I am a pretty fair-minded individual who tends to lean towards supporting things that are of a greater benefit for us all, hence why I even released this addon publicly and did not quietly keep this to myself for an economic advantage within the game. But, I do wish to be contacted regarding so. In addition, If there are  features you would wish to add to this, I am more than happy to consider any pull requests on GitHub. You can find the Github page here: [https://github.com/TheGeneticsGuy/Mass_Salvage_Assist](https://github.com/TheGeneticsGuy/Mass_Salvage_Assist). Thank you for listening, and hopefully for your understanding!
+
+***QUALITY OF LIFE and BUG FIXES***
+
+*I spent an immense amount of time just trying to break crafting here, and I found a number of ways to do it. For example, let's say you are crafting, but then you decide to wander your professions recipes. Well, before, this could interrupt your restacking because you were no longer focused on the right recipe page. This will now take that into account by using. There were probably about half a dozen other ways I found you could erroneously break the nonstop crafting, restacking, and refreshing of the creal all count and I adapted all of them so they will not be an issue. In other words, the addon won't be as sensitive to craft interruption through just normal user behavior. I probably didn't find all of them, but it's a start.*
+
+* No matter the profession, if it's a salvage spell, it will be compatible. Universal compatibility has now been built into this.
+
+* Fixed an issue where the checkbox on the timer for only calculating based on items in bags would disappear and reapper whilst you were parousing your profession recipes. Now, if you are already crafting that checkbox will be locked in so you can toggle on and off at will, even if looking at a different recipe.
+
+* Fixed an issue where the timer button was disappearing behind the profession window when clicking the window. It was really just that the professions window was coming to the front. I adjusted the timer to ensure it shared the same strata and thus would remaing at level with it.
+
+* Fixed an issue where with the slash command sometimes stacks would sometimes fail to stack enough if there were multiple sub-minimum craft size stacks ... tightend up the timings a little bit as well on the stacking.
+
+**NOTE ON THE TIMER AND HOW IT WORKS**
+
+![Timer](https://i.imgur.com/5VGvw9i.jpeg)
+
+Determining the exact estimated countdown is not a perfect thing since there is no way to query the server for the time it takes to craft each time. In addition, lag either from a crowded server, or from your own end can effect the time it takes to craft. So, the key word is this is an estimate only. Here's the logic of how it works:
+
+* The "calculating" delay initially requires 10 crafts to occur. The time between each craft is collected and then the average of those 10 crafts is used to determine time per craft.
+
+* The countdown is refreshed on occasion where a new collection of timestamps is collected and a new average is made. This is done inconspicuously, as to not be obvious, but it will explain to you why say, the countdown timer initially said 7 minutes, but total crafting time end up being 7 minutes and 20 seconds. The timing gets a little tighter the more you craft.
+
+
 ## **Mass Salvage Assist - Version 1.0.6 - Nov 5th, 2024
 
 * The timer window should now only appear automatically when doing a "create all" not just single item crafts

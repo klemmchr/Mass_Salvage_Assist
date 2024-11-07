@@ -47,7 +47,7 @@ CT.Get_Craftable_Count = function()
     local count = 0;
 
     if MSA_save.count_bags_Only and MSA.Crafting.IsMassCraftingSpell(MSA.UI.CT_Core_Frame.craft_id) then
-        count = MSA.Crafting.Get_Remaining_Count_Bags();
+        count = MSA.Crafting.Get_Remaining_Count_Bags( MSA.UI.CT_Core_Frame.craft_id );
         -- Now that we have a count, we need to multiply it by Salvage spell amount
         count = math.floor ( (count / MSA.Crafting.Get_Reagent_Count_Spell (MSA.UI.CT_Core_Frame.craft_id) + 0.5 ) );
     else
@@ -150,9 +150,9 @@ msa_timer:SetScript("OnEvent", function( _ , event , craft_id )
             CT.Initialize_Countdown();
         end
     elseif event == "SPELL_DATA_LOAD_RESULT" then
-        if msa_timer.craft_id ~= craft_id then
+        if msa_timer.craft_id ~= craft_id and not C_TradeSkillUI.IsRecipeRepeating() then
             msa_timer.craft_id = craft_id;
-            if MSA.Crafting.IsMassCraftingSpell(craft_id) then
+            if MSA.Crafting.Is_Salvage_Recipe( craft_id ) then
                 MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
             else
                 MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()

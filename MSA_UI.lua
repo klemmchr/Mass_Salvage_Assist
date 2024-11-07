@@ -48,7 +48,9 @@ UI.LoadUI = function()
         Checkbox_Tracker.craft_id = 0;
         Checkbox_Tracker:SetScript ( "OnEvent" , function( _ , _ , craft_id )
             if Checkbox_Tracker.craft_id ~= craft_id then
-                Checkbox_Tracker.craft_id = craft_id;
+                if not C_TradeSkillUI.IsRecipeRepeating() then
+                    Checkbox_Tracker.craft_id = craft_id;       -- Do not want to overwrite this if player  is just flipping through spells when crafting
+                end
                 UI.Configure_Visiblity( craft_id );
             end
         end);
@@ -107,6 +109,7 @@ UI.Deploy_Timer_UI = function()
         UI.CT_Core_Frame:SetSize( 320 , 110 );
         UI.CT_Core_Frame:EnableMouse ( true );
         UI.CT_Core_Frame:SetToplevel ( true );
+        UI.CT_Core_Frame:SetFrameStrata("HIGH");
         UI.CT_Core_Frame:EnableMouse ( true );
         UI.CT_Core_Frame:SetMovable ( true );
         UI.CT_Core_Frame:RegisterForDrag ( "LeftButton" );
@@ -239,7 +242,7 @@ end
 -- Purpose:         Only show checkbox when necessary.
 UI.Configure_Visiblity = function( craft_id )
     if craft_id then
-        if UI.Is_Supported_Profession(C_TradeSkillUI.GetBaseProfessionInfo().professionID) and MSA.Crafting.IsMassCraftingSpell(craft_id) then
+        if MSA.Crafting.Is_Salvage_Recipe( craft_id ) then -- UI.Is_Supported_Profession(C_TradeSkillUI.GetBaseProfessionInfo().professionID) and MSA.Crafting.IsMassCraftingSpell(craft_id) then
             UI.MSA_checkbox:Show()
         else
             UI.MSA_checkbox:Hide()

@@ -45,7 +45,7 @@ local addon_loaded = false;
 local InitializeAddon = function()
     if MSA.UI and MSA.UI.LoadUI then
         LoadSettings();
-        MSA.Crafting.Establish_Spells();
+
         -- Don't need profession window
         MSA.UI.Deploy_Timer_UI();
         addon_loaded = true;

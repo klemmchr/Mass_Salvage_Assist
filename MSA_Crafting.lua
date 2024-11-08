@@ -5,58 +5,13 @@ MSA.Crafting = Crafting;
 -- Useful globals I haven't put in a tablet yet...
 local combiningStacks = false;
 
--- Method:          Crafting.Establish_Spells()
--- What it DoeS:    Builds the dictionary tables for all the profession spells supported
--- Purpose:         Ensure the UI features are only available at compatible profession spells.
--- Note:            The int value of all ids is the number of reagents that need to be processed in spell
-Crafting.Establish_Spells = function()
-    Crafting.Profs = {}
-    Crafting.Profs.MillingSpells = {
-        [444181] = 10, [382981] = 5, [382982] = 5, [382984] = 5,
-        [382986] = 5, [382987] = 5, [382988] = 5, [382989] = 5,
-        [382990] = 5, [382991] = 5, [382994] = 5
-    }
-    Crafting.Profs.Jewelcrafting = {
-        [434018] = 5, [434020] = 3, [374627] = 5, [395696] = 3, [325248] = 5,
-        [382973] = 5, [382975] = 5, [382977] = 5, [382978] = 5, [404740] = 3,
-        [382979] = 5, [382980] = 5, [382995] = 5
-    }
-    Crafting.Profs.HerbalismRefine = {
-        [438811] = 5, [438812] = 5, [391088] = 5, [391089] = 5
-    }
-    Crafting.Profs.Cooking = {
-        [445117] = 5, [445127] = 5, [445118] = 5, [445119] = 5, [447869] = 5
-    }
-    Crafting.Profs.Alchemy = {
-        [430315] = 20, [370748] = 5, [427214] = 5
-    }
-    Crafting.Profs.Tailoring = {
-        [446926] = 5
-    }
-    Crafting.Profs.Engineering = {
-        [447310] = 5, [447311] = 5
-    }
-    Crafting.Profs.Enchanting = {
-        [470726] = 1, [445466] = 1
-    }
-    Crafting.Profs.Skinning = {
-        [440929] = 5, [440937] = 5, [440938] = 5, [375731] = 5, [440934] = 5,
-        [375763] = 5, [376612] = 5, [376613] = 5, [376614] = 5, [440942] = 5,
-        [440943] = 5, [376611] = 5
-    }
-end
-
 -- Method:          Crafting.Get_Reagent_Count_Spell ( int )
 -- What it Does:    Returns the number of reagents needed for that crafting spell
 -- Purpose:         When combining stacks, I want to always pick the lowest stack first, UNLESS it is small than the minimum stack size to craft
 --                  Why? Well, what if 4 herbs are in an early bag slot, but 1 herb is in the final bag slot? I want to stakc the 4 first or else
 --                  milling will keep erroring. In all other cases I combine smallest to largest.
 Crafting.Get_Reagent_Count_Spell = function( craft_id )
-    for spells in pairs ( Crafting.Profs ) do
-        if Crafting.Profs[spells][craft_id] then
-            return Crafting.Profs[spells][craft_id];
-        end
-    end
+    return C_TradeSkillUI.GetRecipeSchematic( craft_id , false ).quantityMax
 end
 
 -- Method:          Crafting.CombineStacks ( list , int , bool , bool , int )
@@ -408,20 +363,6 @@ Crafting.CraftListener = function ( craft_id )
     end
 end
 
--- Method:          Crafting.IsMassCraftingSpell ( int )
--- What it Does:    Returns true if this is a crafting spell in the list
--- Purpose:         Really just cleaner code to wrap all these truthy checks into a single function.
-Crafting.IsMassCraftingSpell = function( craft_id )
-
-    for spells in pairs ( Crafting.Profs ) do
-        if Crafting.Profs[spells][craft_id] then
-            return true
-        end
-    end
-
-    return false
-end
-
 -- Method:          Crafting.Is_Salvage_Recipe ( int )
 -- What it Does:    Returns true if the recipe is a salvage type recipe
 -- Purpose:         Universal compatibility of any salvage recipe so no need to have a pre-built table of them.
@@ -441,12 +382,12 @@ CraftingFrame:RegisterEvent( "UNIT_SPELLCAST_FAILED" );
 CraftingFrame:SetScript( "OnEvent" , function( _ , event , craft_id , _ , failed_id )
 
     if event == "TRADE_SKILL_CRAFT_BEGIN" then
-        if Crafting.IsMassCraftingSpell ( craft_id ) then
+        if Crafting.Is_Salvage_Recipe ( craft_id ) then
 
             Crafting.CraftListener(craft_id);
         end
 
-    elseif event == "UNIT_SPELLCAST_FAILED" and Crafting.Profs and Crafting.IsMassCraftingSpell ( failed_id ) and MSA_save.non_stop and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
+    elseif event == "UNIT_SPELLCAST_FAILED" and Crafting.Is_Salvage_Recipe ( failed_id ) and MSA_save.non_stop and C_TradeSkillUI.GetCraftableCount(failed_id) > 0 and not combiningStacks then
         local needs_to_stack , more_to_craft = Crafting.Is_More_To_Craft(failed_id);
 
         -- Do we need to restack herbs and restart, or do we need to just restart

@@ -212,37 +212,12 @@ end
 --- UI LOGIC ----
 -----------------
 
--- Method:          UI.Is_Supported_Profession ( int )
--- What it Does:    Returns true if the profession has been added and configured by addon dev for mass crafting
--- Purpose:         Addon will continue to expand usage.
-UI.Is_Supported_Profession = function ( profession_id )
-
-    local ids = {
-        -- [164] = "Blacksmithing",
-        -- [165] = "Leatherworking",
-        [171] = "Alchemy",
-        [182] = "Herbalism",
-        [185] = "Cooking",
-        [197] = "Tailoring",
-        [202] = "Engineering",
-        [333] = 'Enchanting',
-        [393] = "Skinning",
-        [755] = "Jewelcrafting",
-        [773] = "Inscription"
-    }
-
-    if ids[profession_id] then
-        return true
-    end
-    return false
-end
-
 -- Method:          UI.Configure_Visiblity( nil )
 -- What it Does:    Shows or hides the checkbox for mass crafting depending on prfession and spell
 -- Purpose:         Only show checkbox when necessary.
 UI.Configure_Visiblity = function( craft_id )
     if craft_id then
-        if MSA.Crafting.Is_Salvage_Recipe( craft_id ) then -- UI.Is_Supported_Profession(C_TradeSkillUI.GetBaseProfessionInfo().professionID) and MSA.Crafting.IsMassCraftingSpell(craft_id) then
+        if MSA.Crafting.Is_Salvage_Recipe( craft_id ) then
             UI.MSA_checkbox:Show()
         else
             UI.MSA_checkbox:Hide()

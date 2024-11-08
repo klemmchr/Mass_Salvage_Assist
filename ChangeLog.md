@@ -1,5 +1,5 @@
 
-## **Mass Salvage Assist - Version 1.0.7 - Nov 7th, 2024
+## **Mass Salvage Assist - Version 1.0.8 - Nov 7th, 2024
 
 **A NOTE ON DISTRIBUTION OF THIS ADDON, AND MY LEGAL LICENSING**
 
@@ -9,7 +9,7 @@ I Added a License to this as I was approached by an entity who wanted to incorpo
 
 *I spent an immense amount of time just trying to break crafting here, and I found a number of ways to do it. For example, let's say you are crafting, but then you decide to wander your professions recipes. Well, before, this could interrupt your restacking because you were no longer focused on the right recipe page. This will now take that into account by using. There were probably about half a dozen other ways I found you could erroneously break the nonstop crafting, restacking, and refreshing of the creal all count and I adapted all of them so they will not be an issue. In other words, the addon won't be as sensitive to craft interruption through just normal user behavior. I probably didn't find all of them, but it's a start.*
 
-* No matter the profession, if it's a salvage spell, it will be compatible. Universal compatibility has now been built into this.
+* No matter the profession, if it's a salvage spell, it will be compatible. Universal compatibility has now been built into this, allowing it to also be future proof for updates or expansion releases that drop new salvaging recipes.
 
 * Fixed an issue where the checkbox on the timer for only calculating based on items in bags would disappear and reapper whilst you were parousing your profession recipes. Now, if you are already crafting that checkbox will be locked in so you can toggle on and off at will, even if looking at a different recipe.
 

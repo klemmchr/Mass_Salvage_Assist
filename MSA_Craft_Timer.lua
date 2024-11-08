@@ -46,7 +46,7 @@ end
 CT.Get_Craftable_Count = function()
     local count = 0;
 
-    if MSA_save.count_bags_Only and MSA.Crafting.IsMassCraftingSpell(MSA.UI.CT_Core_Frame.craft_id) then
+    if MSA_save.count_bags_Only and MSA.Crafting.Is_Salvage_Recipe(MSA.UI.CT_Core_Frame.craft_id) then
         count = MSA.Crafting.Get_Remaining_Count_Bags( MSA.UI.CT_Core_Frame.craft_id );
         -- Now that we have a count, we need to multiply it by Salvage spell amount
         count = math.floor ( (count / MSA.Crafting.Get_Reagent_Count_Spell (MSA.UI.CT_Core_Frame.craft_id) + 0.5 ) );

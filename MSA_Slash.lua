@@ -191,7 +191,7 @@ SC.Craft = function( recipe_id , item_id )
                         -- Item secured, let's build to craft
                         SC.g_item_id = item_id;
 
-                        if MSA.Crafting.IsMassCraftingSpell(recipe_id) then
+                        if MSA.Crafting.Is_Salvage_Recipe (recipe_id) then
                             MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Show()
                         else
                             MSA.UI.CT_Core_Frame.MSA_In_Bags_Only_Checkbox:Hide()

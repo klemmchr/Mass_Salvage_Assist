@@ -1,8 +1,9 @@
 -- Let's build a listener to help determine total crafting time
 local CT = {};      -- CT for Craft Timer
 CT.timer_table = {}
+
 if MSA then
-    MSA.CT = CT;    -- Compatibiity with Mass Crafting Assist addon
+    MSA.CT = CT;    -- Compatibiity with Mass Crafting Assist addon, in case I ever make this standalone.
 end
 
 -- Method:          CT.Get_Avg_Craft_Time()

@@ -1,5 +1,9 @@
 # Mass Salvage Assist - World of Warcraft Addon
 
+**JOIN-UP ON DISCORD**
+
+[Join Discord Here](https://discord.gg/guBtvUU2ks)
+
 **WHAT IT DOES**
 
 Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass salvage nonstop. For example, Mass milling, prospecting, thaumaturgy, etc.
@@ -53,3 +57,7 @@ Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass 
 * If your initial stack is too small, like say, it's only 5 items and you can only salvage once, then there is not enough time to stack items and continue salvaging, so it will not craft nonstop. There is a built-in delay due to item stacking limits by Blizzard's UI for stacking to complete. As such, you will need to re-trigger crafting in these cases as the addon cannot do it automatically.
 
 ![First Slot Always](https://i.imgur.com/k9KodKZ.png)
+
+**JOIN-UP ON DISCORD**
+
+[Join Discord Here](https://discord.gg/guBtvUU2ks)

@@ -7,6 +7,8 @@ MSA.SC = SC;
 
 -- Hold the item ID from the macro
 SC.g_item_id = 0
+SC.resume_recipe_id = 0
+SC.resume_item_id = 0
 
 -----------------------------
 ---- SLASH COMMAND LOGIC ----
@@ -45,6 +47,9 @@ SlashCmdList["MSA"] = function(input)
 
         elseif command[1] == "reset" then
             SC.Reset()
+
+        elseif command[1] == "resume" then
+            SC.Resume()
 
         else
             SC.Error();
@@ -219,6 +224,18 @@ SC.Craft = function( recipe_id , item_id )
             end
         end
     end
+
+
+    if smaller_stack[1] == -1 then
+        print( "MSA: No items in bags to craft." );
+    else
+        local itemLink = select ( 2 , GetItemInfo(item_id) );
+        if not itemLink then
+            itemLink = "";
+        end
+
+        print( string.format ( "MSA: Not enough to craft - %dx %s remaining in bags." , smaller_stack[3] , itemLink ) );
+    end
 end
 
 -- Method:          SC.Nonstep_Disabled_Msg()
@@ -278,6 +295,18 @@ SC.Reset = function()
     MSA.UI.CT_Core_Frame:SetPoint ( MSA_save.pos[1] , UIParent , MSA_save.pos[2] , MSA_save.pos[3] , MSA_save.pos[4] );
 end
 
+-- Method:          SC.Resume()
+-- What it Does:    Restarts crafting by resuming where they left off.
+-- Purpose:         Just a QOL feature.
+SC.Resume = function()
+    if MSA.SC.resume_recipe_id == 0 or MSA.SC.resume_item_id == 0 then
+        print("MSA: No crafting spell is ready to resume.")
+    else
+        print("MSA: Resuming..." )
+        SC.Craft ( MSA.SC.resume_recipe_id , MSA.SC.resume_item_id );
+    end
+end
+
 -- Method:          SC.Help()
 -- What it Does:    Prints out the slash commands available and how to use them
 -- Purpose:         Useful to have slash command help
@@ -289,10 +318,11 @@ SC.Help = function()
     print('- /msa craft recipe_id item_id')
     print('- /msa craft 382981 191461')
     print("\n")
-    print("- /msa enable  - Turn on endless salvaging")
-    print("- /msa disable - Turn off endless salvaging")
-    print("- /msa timer    - Show or Hide the Crafting Timer")
-    print("- /msa reset    - Resets timer position to default")
+    print("- /msa enable    - Turn on endless salvaging")
+    print("- /msa disable   - Turn off endless salvaging")
+    print("- /msa resume   - Continue with most recently used spell")
+    print("- /msa timer      - Show or Hide the Crafting Timer")
+    print("- /msa reset      - Resets timer position to default")
 end
 
 -- /run ProfessionsFrame.CraftingPage.CraftingOutputLog:Cleanup()

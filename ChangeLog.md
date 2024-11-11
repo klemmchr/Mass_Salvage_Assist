@@ -1,4 +1,20 @@
 
+
+## **Mass Salvage Assist - Version 1.0.9 - Nov 10th, 2024
+
+**NEW FEATURE**
+
+* Added the `/msa resume` feature. If your crafting is interrupted for whatever reason, this will just continue where you left off, no matter the profession recipe or item you are salvaging. Whether you start the crafting by using a macro/slash command, or you start the crafting from the profession window, it doesn't matter. You can then just type `/msa resume` to continue.
+
+**QUALITY OF LIFE**
+
+* Added some messaging to the slash command so if you are out of items in your bags and you try to use the slash command/macro, it will inform you rather than just not saying anything.
+
+**BUG FIXES**
+
+* Fixed a bug where if you manually selected a stack in your bank tab, whilst still having a small stack that was too small within your bags, it would get stuck in a loop trying to stack, except it couldn't stack. This will no longer happen. In addition, the addon will inform you if you erroneously selected something not in your bags now.
+
+
 ## **Mass Salvage Assist - Version 1.0.8 - Nov 7th, 2024
 
 **A NOTE ON DISTRIBUTION OF THIS ADDON, AND MY LEGAL LICENSING**

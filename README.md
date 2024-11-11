@@ -36,7 +36,8 @@ Assists in Mass Salvaging/crafting in World of Warcraft by allowing you to mass 
     - /msa help
     - /msa enable   - Turn on endless salvaging
     - /msa disable  - Turn off endless salvaging
-    - /msa timer     - Show or Hide the Crafting Timer
+    - /msa resume   - Continue with most recently used spell
+    - /msa timer    - Show or Hide the Crafting Timer
     - /msa reset    - Resets timer position to default
 
 ![Example](https://i.imgur.com/8r91gAQ.gif)

@@ -78,6 +78,7 @@ Crafting.CombineStacks = function( scrapSlot , itemID , forced , restart_craftin
 
             if lowestStack then
                 -- Now, let's combine all of the smallest stacks to biggest stacks.
+                print("Slot: " .. scrapSlot[1] .. " : " .. scrapSlot[2] .. " --" .. lowestStack[1] .. " : " .. lowestStack[2])
                 C_Container.PickupContainerItem( lowestStack[1] , lowestStack[2] );
                 C_Container.PickupContainerItem( scrapSlot[1] , scrapSlot[2] );
 
@@ -177,7 +178,13 @@ Crafting.GetSalveItemDetails = function( restart_crafting , craft_id )
         end
 
         if itemDetails then
-            return { itemDetails.bagID , itemDetails.slotIndex , stack_count } , item_id;
+            -- Return nil if the item selected is not in your bags... as that is not helpful.
+            if itemDetails.bagID < 0 or itemDetails.bagID > 5 then
+                print("MSA: This addon will only work with items selected within your bags. Please move items to your bags and re-select." );
+                return;
+            else
+                return { itemDetails.bagID , itemDetails.slotIndex , stack_count } , item_id;
+            end
         end
     end
 end

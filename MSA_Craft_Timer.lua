@@ -122,10 +122,22 @@ CT.Initialize_Countdown = function( isRepeating )
                     end
                 end
 
+                -- Clear the resumes since starting new
+                MSA.SC.resume_recipe_id = 0
+                MSA.SC.resume_item_id = 0;
+
                 CT.Initialize_Countdown( true );
             else
                 -- Crafting Stopped - Reset values
                 CT.timer_table = {};
+
+                -- let's setup the resume values, but only for salvage recipes
+                if MSA.Crafting.Is_Salvage_Recipe ( MSA.UI.CT_Core_Frame.craft_id ) then
+                    MSA.SC.resume_recipe_id = MSA.UI.CT_Core_Frame.craft_id
+                    MSA.SC.resume_item_id = MSA.SC.g_item_id
+                end
+
+                -- reset the rest
                 MSA.UI.CT_Core_Frame.value = 0;
                 MSA.UI.CT_Core_Frame.craft_id = 0;
                 countdown_running = false;
